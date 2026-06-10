@@ -42,13 +42,13 @@ export default function Home() {
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground mb-4">
               Hi, 我是{" "}
-              <span className="text-primary">你的名字</span>
+              <span className="text-primary">王景皓</span>
             </h1>
             <p className="text-xl sm:text-2xl text-foreground-secondary mb-2">
-              全栈开发者 / 设计师
+              Agent 全栈开发者
             </p>
             <p className="text-lg text-foreground-secondary max-w-2xl mx-auto mb-8">
-              热爱技术，专注于构建优雅的 Web 应用。在这里分享我的项目、思考和学习笔记。
+              热爱技术，专注于构建智能化的 Agent应用。在这里分享我的项目、思考和学习笔记。
             </p>
 
             {/* CTA Buttons */}

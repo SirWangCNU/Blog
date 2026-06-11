@@ -11,6 +11,296 @@ export interface Post {
 
 export const posts: Post[] = [
   {
+    slug: "multimodal-rag-architecture",
+    title: "多模态 RAG 系统架构设计：从文本检索到图文联合理解",
+    excerpt:
+      "解析多模态 RAG 的向量索引策略、跨模态检索机制与上下文融合方案，构建生产级知识问答系统。",
+    date: "2026-06-11",
+    readTime: "14 分钟",
+    tags: ["RAG", "AIGC", "向量数据库", "多模态", "架构设计"],
+    category: "AIGC",
+    content: `
+## 多模态 RAG 的核心挑战
+
+传统 RAG 只处理纯文本，但企业知识库大量包含图表、流程图、截图等视觉信息。多模态 RAG 需要统一处理文本、图像、表格等多种数据形态。
+
+## 架构分层设计
+
+### 1. 数据摄入层（Ingestion）
+
+文档解析采用分层策略：PDF 用 PyMuPDF 提取文本层，OCR 回退处理扫描件。图片通过 CLIP 编码为 512 维向量，表格转为 Markdown 保留结构信息。每种模态维护独立的 embedding 模型，避免语义空间污染。
+
+### 2. 索引存储层（Index）
+
+使用 Milvus 或 Qdrant 作为向量数据库，支持混合索引：HNSW 用于高召回向量检索，倒排索引用于关键词过滤。关键设计是建立跨模态映射表，将图片 chunk 关联到其所在文档的文本上下文，保证检索时能返回完整的图文组合。
+
+### 3. 检索融合层（Retrieval Fusion）
+
+采用 Reciprocal Rank Fusion（RRF）合并多路召回结果。对用户 query 做意图分类：纯文本查询走文本检索通道，包含"如图所示"等视觉指示词的查询走多模态通道。融合后的 top-k 结果经过 Cross-Encoder 重排序，显著提升相关性。
+
+### 4. 生成层（Generation）
+
+将检索到的文本 chunk 和图片 URL 一起注入 LLM prompt。对 GPT-4o 等原生多模态模型直接传图；对纯文本模型则用 BLIP-2 生成图片描述后拼接。流式输出时采用 SSE 推送，前端渐进渲染。
+
+## 生产环境踩坑
+
+- 向量维度不统一：统一用 CLIP ViT-L/14 的 768 维
+- 检索延迟过高：引入缓存层，对高频 query 缓存检索结果
+- 图文关联丢失：chunk 切分时保留 20% 重叠区间
+    `,
+  },
+  {
+    slug: "python-pydantic-v2-deep-dive",
+    title: "Python 类型系统与 Pydantic V2 深度实践：从验证到序列化的全链路优化",
+    excerpt:
+      "掌握 Pydantic V2 的 Rust 内核、自定义校验器、递归模型与高性能序列化技巧，构建类型安全的后端服务。",
+    date: "2026-06-11",
+    readTime: "11 分钟",
+    tags: ["Python", "Pydantic", "类型系统", "FastAPI", "后端"],
+    category: "后端",
+    content: `
+## Pydantic V2 的底层变革
+
+V2 核心用 Rust 重写（pydantic-core），验证性能提升 5-50 倍。不再依赖 Python 描述符协议，而是编译 JSON Schema 到 Rust 验证链。
+
+## 核心实践
+
+### 1. 模型设计模式
+
+\`\`\`python
+from pydantic import BaseModel, Field, model_validator
+
+class OrderItem(BaseModel):
+    product_id: str = Field(pattern=r'^[A-Z]{3}-\d{4}$')
+    quantity: int = Field(gt=0, le=999)
+    price: float = Field(gt=0)
+
+    @model_validator(mode='after')
+    def check_bulk_discount(self) -> 'OrderItem':
+        if self.quantity > 100 and self.price < 0.01:
+            raise ValueError('批量订单单价不能低于 0.01')
+        return self
+\`\`\`
+
+Field 约束在 Rust 层执行，零 Python 开销。model_validator 替代了 V1 的 root_validator，语义更清晰。
+
+### 2. 递归模型处理
+
+处理树形数据（如评论嵌套）时用 \`model_rebuild()\` 延迟重建：
+
+\`\`\`python
+class Comment(BaseModel):
+    text: str
+    replies: list['Comment'] = []
+
+Comment.model_rebuild()  # 触发延迟类型解析
+\`\`\`
+
+### 3. 高性能序列化
+
+V2 的 \`.model_dump()\` 比 V1 的 \`.dict()\` 快 3 倍。对大批量数据用 \`.model_dump_json()\` 直接序列化为 JSON 字符串，跳过 Python dict 中间态。
+
+### 4. 与 FastAPI 集成
+
+FastAPI 利用 Pydantic 的 JSON Schema 自动生成 OpenAPI 文档。注意：响应模型的 \`response_model\` 会触发二次序列化，高吞吐场景考虑用 \`.model_dump()\` 手动返回 dict 绕过。
+
+## 常见陷阱
+
+- V2 移除了 \`Optional[str]\` 的默认值推断，必须显式写 \`str | None = None\`
+- \`ConfigDict\` 替代了 class Config 内嵌类
+- \`validator\` 装饰器已废弃，统一用 \`field_validator\` / \`model_validator\`
+    `,
+  },
+  {
+    slug: "nextjs-15-server-components-streaming",
+    title: "Next.js 15 Server Components 与流式渲染实战：首屏性能优化全攻略",
+    excerpt:
+      "深入理解 RSC 运行时机制、Suspense 边界编排、流式 SSR 原理及与客户端组件的协作模式。",
+    date: "2026-06-11",
+    readTime: "13 分钟",
+    tags: ["Next.js", "React", "Server Components", "前端", "性能优化"],
+    category: "前端",
+    content: `
+## Server Components 的本质
+
+React Server Components（RSC）不是 SSR 的升级版，而是全新的组件执行模型。Server Components 只在服务端运行，输出序列化的组件树（RSC Payload），零 JS 发送到客户端。
+
+## 核心机制
+
+### 1. 渲染流水线
+
+请求到达 → Server Component 执行（可直接查 DB）→ 生成 RSC Payload → 客户端 React 用 Payload 构建虚拟 DOM → 嵌入 Client Component 占位符 → 流式传输 → 客户端 hydrate Client Component
+
+### 2. Suspense 流式边界
+
+\`\`\`tsx
+// page.tsx (Server Component)
+export default async function Dashboard() {
+  // 快速返回 shell
+  return (
+    <div className="dashboard">
+      <Header />  {/* 立即流式输出 */}
+      <Suspense fallback={<Skeleton />}>
+        <AnalyticsChart />  {/* 数据就绪后追加 */}
+      </Suspense>
+      <Suspense fallback={<Spinner />}>
+        <RecentOrders />  {/* 独立流式块 */}
+      </Suspense>
+    </div>
+  );
+}
+\`\`\`
+
+每个 Suspense 边界独立流式输出，先到先显示。TTFB 取决于最外层 Server Component 的执行时间，而非所有数据源的总和。
+
+### 3. Server/Client 组件协作
+
+Server Component 可以 import Client Component，但反过来不行。传递数据时 Server → Client 必须可序列化（不能传函数）。常见模式：Server Component 负责数据获取，通过 props 注入 Client Component。
+
+### 4. 缓存策略
+
+Next.js 15 默认 Request-level 缓存（不再默认静态化）。用 \`unstable_cache\` 包裹重复查询，配合 \`revalidateTag\` 实现精准缓存失效。
+
+## 性能对比
+
+- 传统 CSR：FCP 3.2s → 优化后 RSC 流式：FCP 0.8s
+- Bundle 减少 40%：Server Component 的依赖不进入客户端包
+- LCP 优化：首屏关键数据通过最近的 Suspense 边界优先传输
+    `,
+  },
+  {
+    slug: "agent-toolchain-function-calling",
+    title: "Agent 工具链设计与 Function Calling 最佳实践：从单工具到复杂编排",
+    excerpt:
+      "详解 Function Calling 协议设计、工具注册机制、多工具并行调用与错误恢复策略。",
+    date: "2026-06-11",
+    readTime: "12 分钟",
+    tags: ["Agent", "Function Calling", "LLM", "工具链", "AIGC"],
+    category: "AIGC",
+    content: `
+## Function Calling 的本质
+
+Function Calling 是 LLM 与外部世界交互的标准协议。模型不直接执行工具，而是输出结构化的调用指令（JSON），由运行时负责执行并将结果回传。
+
+## 工具链设计模式
+
+### 1. 工具注册与描述
+
+\`\`\`python
+tools = [{
+    "type": "function",
+    "function": {
+        "name": "search_docs",
+        "description": "搜索内部文档库，返回相关段落。当用户询问公司政策、产品文档时使用。",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "query": {"type": "string", "description": "搜索关键词"},
+                "top_k": {"type": "integer", "default": 5}
+            },
+            "required": ["query"]
+        }
+    }
+}]
+\`\`\`
+
+description 是关键——它决定了模型何时选择这个工具。写得越具体，误触发率越低。
+
+### 2. 多工具并行调用
+
+GPT-4o 等模型支持单轮返回多个 tool_call。运行时应并行执行：
+
+\`\`\`python
+import asyncio
+
+async def execute_tool_calls(tool_calls):
+    tasks = [dispatch_tool(tc) for tc in tool_calls]
+    return await asyncio.gather(*tasks, return_exceptions=True)
+\`\`\`
+
+注意处理单个工具失败的情况——用 return_exceptions=True 收集错误，将错误信息回传给模型做二次推理。
+
+### 3. 工具链编排
+
+复杂任务需要多步工具调用。采用 ReAct 循环：思考 → 调用工具 → 观察结果 → 继续思考。关键约束是设置最大迭代次数（通常 5-10 次），防止死循环。
+
+### 4. 错误恢复策略
+
+- 工具超时：设置 30s 硬超时，返回超时提示让模型换策略
+- 参数校验失败：将 schema 约束反馈给模型重新生成
+- 工具不存在：返回可用工具列表引导模型选择
+
+## 安全边界
+
+- 敏感工具（如删除操作）设置 confirm 标记，二次确认
+- 工具权限分级：只读 / 读写 / 管理员
+- 输入清洗：防止 prompt injection 通过工具参数注入
+    `,
+  },
+  {
+    slug: "go-rust-concurrency-service-comparison",
+    title: "Go vs Rust 高性能并发服务选型：从 goroutine 到 async runtime 的深度对比",
+    excerpt:
+      "对比 Go 和 Rust 在并发模型、内存管理、编译效率和实际 QPS 表现上的差异，给出选型建议。",
+    date: "2026-06-11",
+    readTime: "10 分钟",
+    tags: ["Go", "Rust", "并发", "系统架构", "性能优化"],
+    category: "后端",
+    content: `
+## 并发模型对比
+
+### Go：goroutine + channel
+
+Go 的并发基于 CSP 模型。goroutine 是用户态协程，初始栈仅 2KB，可轻松创建百万级。channel 是唯一的通信方式，强调"不要通过共享内存通信，要通过通信共享内存"。
+
+\`\`\`go
+func processOrders(orders <-chan Order, results chan<- Result) {
+    for order := range orders {
+        result := heavyComputation(order)
+        results <- result
+    }
+}
+// 启动 1000 个 worker，调度器自动分配到 OS 线程
+for i := 0; i < 1000; i++ {
+    go processOrders(orderCh, resultCh)
+}
+\`\`\`
+
+### Rust：async/await + tokio
+
+Rust 的异步基于 Future trait，编译器将 async 函数转换为状态机。tokio 提供多线程 runtime，work-stealing 调度。
+
+\`\`\`rust
+async fn process_order(order: Order) -> Result {
+    let data = fetch_remote(order.id).await?;  // 非阻塞 I/O
+    let result = compute(data).await;
+    Ok(result)
+}
+// tokio 自动调度到线程池
+let tasks: Vec<_> = orders.into_iter()
+    .map(|o| tokio::spawn(process_order(o)))
+    .collect();
+futures::future::join_all(tasks).await;
+\`\`\`
+
+## 关键差异
+
+| 维度 | Go | Rust |
+|------|-----|------|
+| 内存管理 | GC（~1ms STW） | 零开销所有权 |
+| 数据竞争 | 运行时 panic | 编译期阻止 |
+| 学习曲线 | 低 | 高（生命周期、借用） |
+| 编译速度 | 快 | 慢（宏展开 + LLVM） |
+| 峰值 QPS | 高 | 更高（无 GC 抖动） |
+
+## 选型建议
+
+- **选 Go**：团队快速上手、微服务网关、DevOps 工具、API 服务
+- **选 Rust**：极致性能要求、低延迟系统（交易引擎）、嵌入式/WebAssembly、安全关键场景
+- **混合方案**：Go 写业务层 + Rust 写性能热点的 FFI 扩展
+    `,
+  },
+  {
     slug: "zcreativefactory-ai-comic-engine",
     title: "ZCreativeFactory 漫剧工厂 — AIGC 全流程自动化漫剧创作平台",
     excerpt:

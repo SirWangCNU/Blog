@@ -8,6 +8,7 @@ import { projects } from "@/data/projects";
 import { posts } from "@/data/posts";
 
 const skills = [
+<<<<<<< HEAD
   "Python",
   "FastAPI",
   "LangChain",
@@ -20,6 +21,16 @@ const skills = [
   "Redis",
   "并发编程",
   "Linux",
+=======
+  "React",
+  "Next.js",
+  "TypeScript",
+  "Node.js",
+  "Tailwind CSS",
+  "Python",
+  "Git",
+  "Docker",
+>>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
 ];
 
 export default function Home() {
@@ -28,14 +39,21 @@ export default function Home() {
 
   return (
     <div className="flex flex-col">
+<<<<<<< HEAD
       {/* 主页横幅 */}
       <section className="relative min-h-[85vh] flex items-center justify-center px-4">
+=======
+      {/* Hero Section */}
+      <section className="relative min-h-[80vh] flex items-center justify-center px-4">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
+>>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
         <div className="relative max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
+<<<<<<< HEAD
             {/* 终端卡片 */}
             <div className="mb-8 inline-block">
               <div className="bg-card border border-primary/20 rounded-lg px-6 py-4 text-left font-mono text-sm">
@@ -82,32 +100,74 @@ export default function Home() {
               <Link
                 href="/projects"
                 className="px-8 py-3 border border-primary/40 text-primary rounded font-mono hover:bg-primary/10 transition-colors"
+=======
+            {/* Avatar */}
+            <div className="mb-8">
+              <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+                👋
+              </div>
+            </div>
+
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground mb-4">
+              Hi, 我是{" "}
+              <span className="text-primary">王景皓</span>
+            </h1>
+            <p className="text-xl sm:text-2xl text-foreground-secondary mb-2">
+              Agent 全栈开发者
+            </p>
+            <p className="text-lg text-foreground-secondary max-w-2xl mx-auto mb-8">
+              热爱技术，专注于构建智能化的 Agent应用。在这里分享我的项目、思考和学习笔记。
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link
+                href="/projects"
+                className="px-8 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-hover transition-colors shadow-lg shadow-primary/25"
+>>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
               >
                 查看项目
               </Link>
               <Link
                 href="/blog"
+<<<<<<< HEAD
                 className="px-8 py-3 border border-primary/40 text-primary rounded font-mono hover:bg-primary/10 transition-colors"
+=======
+                className="px-8 py-3 border border-border text-foreground rounded-lg font-medium hover:bg-background-secondary transition-colors"
+>>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
               >
                 阅读博客
               </Link>
             </div>
           </motion.div>
 
+<<<<<<< HEAD
           {/* 技能标签 */}
+=======
+          {/* Skills */}
+>>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
+<<<<<<< HEAD
             className="mt-16 flex flex-wrap justify-center gap-2"
+=======
+            className="mt-16 flex flex-wrap justify-center gap-3"
+>>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
           >
             {skills.map((skill, index) => (
               <motion.span
                 key={skill}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
+<<<<<<< HEAD
                 transition={{ duration: 0.3, delay: 0.5 + index * 0.06 }}
                 className="px-3 py-1.5 rounded font-mono text-xs tag-hacker cursor-default"
+=======
+                transition={{ duration: 0.3, delay: 0.5 + index * 0.1 }}
+                className="px-4 py-2 bg-background-secondary rounded-full text-sm font-medium text-foreground-secondary border border-border hover:border-primary/30 hover:text-primary transition-all cursor-default"
+>>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
               >
                 {skill}
               </motion.span>
@@ -116,6 +176,7 @@ export default function Home() {
         </div>
       </section>
 
+<<<<<<< HEAD
       {/* 数据统计 */}
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -142,6 +203,9 @@ export default function Home() {
       </section>
 
       {/* 精选项目 */}
+=======
+      {/* Featured Projects */}
+>>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
       <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div
@@ -151,10 +215,17 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             className="text-center mb-12"
           >
+<<<<<<< HEAD
             <h2 className="text-2xl font-bold text-foreground mb-2 font-mono">
               ✨ 精选项目
             </h2>
             <p className="text-foreground-secondary text-sm">
+=======
+            <h2 className="text-3xl font-bold text-foreground mb-4">
+              ✨ 精选项目
+            </h2>
+            <p className="text-foreground-secondary">
+>>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
               这些是我最引以为傲的作品
             </p>
           </motion.div>
@@ -174,15 +245,38 @@ export default function Home() {
           >
             <Link
               href="/projects"
+<<<<<<< HEAD
               className="inline-flex items-center gap-2 text-primary hover:text-primary-hover font-mono text-sm transition-colors"
             >
               查看所有项目 →
+=======
+              className="inline-flex items-center gap-2 text-primary hover:text-primary-hover font-medium transition-colors"
+            >
+              查看所有项目
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
+              </svg>
+>>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
             </Link>
           </motion.div>
         </div>
       </section>
 
+<<<<<<< HEAD
       {/* 最新博客 */}
+=======
+      {/* Latest Posts */}
+>>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
       <section className="py-20 px-4 bg-background-secondary">
         <div className="max-w-4xl mx-auto">
           <motion.div
@@ -192,10 +286,17 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             className="text-center mb-12"
           >
+<<<<<<< HEAD
             <h2 className="text-2xl font-bold text-foreground mb-2 font-mono">
               📝 最新技术文章
             </h2>
             <p className="text-foreground-secondary text-sm">
+=======
+            <h2 className="text-3xl font-bold text-foreground mb-4">
+              📝 最新博客
+            </h2>
+            <p className="text-foreground-secondary">
+>>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
               记录技术思考与学习笔记
             </p>
           </motion.div>
@@ -215,13 +316,33 @@ export default function Home() {
           >
             <Link
               href="/blog"
+<<<<<<< HEAD
               className="inline-flex items-center gap-2 text-primary hover:text-primary-hover font-mono text-sm transition-colors"
             >
               查看所有文章 →
+=======
+              className="inline-flex items-center gap-2 text-primary hover:text-primary-hover font-medium transition-colors"
+            >
+              查看所有文章
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
+              </svg>
+>>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
             </Link>
           </motion.div>
         </div>
       </section>
+<<<<<<< HEAD
 
       {/* 技术栈 */}
       <section className="py-20 px-4">
@@ -301,6 +422,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+=======
+>>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
     </div>
   );
 }

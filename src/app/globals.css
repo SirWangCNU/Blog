@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+<<<<<<< HEAD
 /* ===== 赛博朋克极客主题 ===== */
 :root {
   --background: #0b0e14;
@@ -30,6 +31,37 @@
   --card-hover: #161d2e;
   --code-bg: #111622;
   --header-bg: rgba(11, 14, 20, 0.92);
+=======
+/* ===== 色彩主题系统 ===== */
+:root {
+  --background: #ffffff;
+  --background-secondary: #f8fafc;
+  --foreground: #0f172a;
+  --foreground-secondary: #64748b;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --accent: #8b5cf6;
+  --border: #e2e8f0;
+  --card: #ffffff;
+  --card-hover: #f8fafc;
+  --code-bg: #f1f5f9;
+  --header-bg: rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="dark"] {
+  --background: #0f172a;
+  --background-secondary: #1e293b;
+  --foreground: #f1f5f9;
+  --foreground-secondary: #94a3b8;
+  --primary: #60a5fa;
+  --primary-hover: #93bbfd;
+  --accent: #a78bfa;
+  --border: #334155;
+  --card: #1e293b;
+  --card-hover: #334155;
+  --code-bg: #1e293b;
+  --header-bg: rgba(15, 23, 42, 0.8);
+>>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
 }
 
 @theme inline {
@@ -53,6 +85,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
+<<<<<<< HEAD
   font-family: var(--font-mono), "JetBrains Mono", "Fira Code", "Noto Sans SC", monospace;
   transition: background-color 0.3s ease, color 0.3s ease;
   position: relative;
@@ -112,12 +145,53 @@ body::before {
 @keyframes fade-in-up {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
+=======
+  font-family: var(--font-sans), "Noto Sans SC", system-ui, -apple-system, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--foreground-secondary);
+}
+
+/* 选中文本颜色 */
+::selection {
+  background: var(--primary);
+  color: white;
+}
+
+/* 幻灯片动画 */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+>>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
 }
 
 .animate-fade-in-up {
   animation: fade-in-up 0.6s ease-out forwards;
 }
 
+<<<<<<< HEAD
 .animate-glow {
   animation: glow-pulse 2s ease-in-out infinite;
 }
@@ -221,4 +295,45 @@ button {
 
 .btn-hacker:hover::after {
   left: 100%;
+=======
+.animation-delay-200 {
+  animation-delay: 0.2s;
+}
+
+.animation-delay-400 {
+  animation-delay: 0.4s;
+}
+
+/* 链接下划线动画 */
+.link-underline {
+  position: relative;
+  text-decoration: none;
+}
+
+.link-underline::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background-color: var(--primary);
+  transition: width 0.3s ease;
+}
+
+.link-underline:hover::after {
+  width: 100%;
+}
+
+/* 代码块样式 */
+pre {
+  background: var(--code-bg) !important;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+code {
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+>>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
 }

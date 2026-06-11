@@ -24,14 +24,14 @@ const timeline = [
 ];
 
 const skills = [
-  { name: "Python / FastAPI", level: 90 },
-  { name: "LangChain / Agent 开发", level: 85 },
-  { name: "React / Next.js", level: 80 },
-  { name: "TypeScript", level: 80 },
-  { name: "并发编程 / 系统架构", level: 85 },
-  { name: "Docker / 运维部署", level: 75 },
-  { name: "AIGC 模型集成", level: 90 },
-  { name: "MySQL / 向量数据库", level: 80 },
+  { name: "Java / Python", level: 90 },
+  { name: "Spring Boot 3 / FastAPI / Django", level: 85 },
+  { name: "LangChain / LangGraph / Spring AI", level: 90 },
+  { name: "MySQL / PostgreSQL / Milvus", level: 85 },
+  { name: "React / Next.js / TypeScript", level: 80 },
+  { name: "Transformer / LoRA / RLHF", level: 85 },
+  { name: "Docker / WSL2 / Git", level: 80 },
+  { name: "MCP / Agent Skills / RAG", level: 90 },
 ];
 
 export default function AboutPage() {
@@ -62,7 +62,7 @@ export default function AboutPage() {
         </div>
       </motion.div>
 
-      {/* 经历时间线 */}
+      {/* 技能特长 */}
       <motion.section
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -70,31 +70,43 @@ export default function AboutPage() {
         className="mb-16"
       >
         <h2 className="text-xl font-bold text-foreground mb-6">
-          <span className="text-primary">#</span> 工作经历
+          <span className="text-primary">#</span> 技能特长
         </h2>
-        <div className="relative">
-          <div className="absolute left-3 top-0 bottom-0 w-px bg-primary/20" />
-          <div className="space-y-6">
-            {timeline.map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
-                className="relative pl-10"
-              >
-                <div
-                  className="absolute left-1.5 top-2 w-3 h-3 rounded-full bg-primary/80 border-2 border-background"
-                  style={{ boxShadow: "0 0 6px rgba(83, 216, 168, 0.4)" }}
-                />
-                <div className="bg-card border border-primary/10 rounded-lg p-4 hover:border-primary/30 transition-colors">
-                  <div className="text-primary text-xs mb-1">{item.year}</div>
-                  <h3 className="text-foreground font-bold text-sm">{item.title}</h3>
-                  <div className="text-foreground-secondary text-xs mb-2">{item.company}</div>
-                  <p className="text-foreground-secondary text-xs leading-relaxed">{item.desc}</p>
-                </div>
-              </motion.div>
-            ))}
+        <div className="bg-card border border-primary/15 rounded-lg p-6 text-sm leading-relaxed text-foreground-secondary space-y-4">
+          <div>
+            <span className="text-primary font-bold">语言与工具：</span>
+            熟练使用 Java、Python 进行后端开发，熟悉 Hutool、Lombok 等工具库，显著提升工程效率与代码质量
+          </div>
+          <div>
+            <span className="text-primary font-bold">数据库：</span>
+            <ul className="ml-4 mt-1 space-y-1">
+              <li>• 关系型数据库：熟练掌握 MySQL、PostgreSQL，具备数据库设计、性能调优与高并发场景优化能力</li>
+              <li>• 向量数据库：深入理解 Milvus 向量数据库，支持 RAG 知识库、语义检索与向量召回场景</li>
+            </ul>
+          </div>
+          <div>
+            <span className="text-primary font-bold">后端框架：</span>
+            深入掌握 Spring Boot 3 / Spring MVC / MyBatis / FastAPI / Django 等主流框架，具备优秀的 RESTful API 设计能力，擅长模块化开发与架构设计
+          </div>
+          <div>
+            <span className="text-primary font-bold">深度学习：</span>
+            理解 Transformer 架构，熟练运用 LoRA、RLHF 等大模型微调技术，掌握模型剪枝、量化与知识蒸馏等压缩技术，优化推理性能
+          </div>
+          <div>
+            <span className="text-primary font-bold">AI 框架：</span>
+            精通 LangChain、LangGraph、Spring AI、LangChain4j 等框架，构建企业级 AI 原生应用，深入理解 RAG 知识库架构，熟练实现 Tool Calling 工具调用
+          </div>
+          <div>
+            <span className="text-primary font-bold">智能体与提示工程：</span>
+            熟悉 MCP（Model Context Protocol）协议与 Agent Skills 规范，能设计基于 CoT、ReACT 模式的自主智能体，精通 CoT、Few-shot、多视角分析等 Prompt 工程策略
+          </div>
+          <div>
+            <span className="text-primary font-bold">AI 辅助编程：</span>
+            熟练掌握使用 Vibe Coding，精通 Cursor、Claude Code、Codex、Trae 等 AI 编程工具，开发效率巨大提升
+          </div>
+          <div>
+            <span className="text-primary font-bold">工程化能力：</span>
+            熟练使用 Git 进行版本控制与多人协作开发，熟练掌握 Docker 容器化部署与 WSL2 开发环境搭建，具备云服务器部署与 AI 自动化运维能力
           </div>
         </div>
       </motion.section>

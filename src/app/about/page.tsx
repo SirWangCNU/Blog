@@ -144,42 +144,60 @@ export default function AboutPage() {
         <h2 className="text-xl font-bold text-foreground mb-6">
           <span className="text-primary">#</span> 技能特长
         </h2>
-        <div className="bg-card border border-primary/15 rounded-lg p-6 text-sm leading-relaxed text-foreground-secondary space-y-4">
-          <div>
-            <span className="text-primary font-bold">语言与工具：</span>
-            熟练使用 Java、Python 进行后端开发，熟悉 Hutool、Lombok 等工具库，显著提升工程效率与代码质量
-          </div>
-          <div>
-            <span className="text-primary font-bold">数据库：</span>
-            <ul className="ml-4 mt-1 space-y-1">
-              <li>• 关系型数据库：熟练掌握 MySQL、PostgreSQL，具备数据库设计、性能调优与高并发场景优化能力</li>
-              <li>• 向量数据库：熟练使用 Milvus，支持 RAG 知识库、语义检索与向量召回场景</li>
-            </ul>
-          </div>
-          <div>
-            <span className="text-primary font-bold">后端框架：</span>
-            熟练使用 Spring Boot 3 / Spring MVC / MyBatis / FastAPI / Django 等主流框架，具备优秀的 RESTful API 设计能力
-          </div>
-          <div>
-            <span className="text-primary font-bold">深度学习：</span>
-            理解 Transformer 架构，熟练运用 LoRA、RLHF 等大模型微调技术，掌握模型剪枝、量化与知识蒸馏等压缩技术
-          </div>
-          <div>
-            <span className="text-primary font-bold">AI 框架：</span>
-            熟悉 LangChain、LangGraph、Spring AI、LangChain4j 等框架，深入理解 RAG 知识库架构，熟练实现 Tool Calling
-          </div>
-          <div>
-            <span className="text-primary font-bold">智能体与提示工程：</span>
-            熟悉 MCP（Model Context Protocol）协议与 Agent Skills 规范，能设计基于 CoT、ReACT 模式的自主智能体
-          </div>
-          <div>
-            <span className="text-primary font-bold">AI 辅助编程：</span>
-            熟练使用 Vibe Coding，精通 Cursor、Claude Code、Codex、Trae 等 AI 编程工具
-          </div>
-          <div>
-            <span className="text-primary font-bold">工程化能力：</span>
-            熟练使用 Git 版本控制，熟悉 Linux/macOS 开发环境，掌握 Docker 容器化部署与 WSL2 开发环境搭建
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {[
+            {
+              icon: "🧠",
+              title: "AI 工程",
+              tech: "LangChain / LangGraph / Spring AI / MCP / RAG",
+              desc: "多智能体编排、Tool Calling、CoT/ReACT 自主体设计",
+            },
+            {
+              icon: "⚙️",
+              title: "语言与框架",
+              tech: "Java / Python / FastAPI / Spring Boot 3 / Django",
+              desc: "RESTful API 设计、模块化架构、高并发场景",
+            },
+            {
+              icon: "🗄️",
+              title: "数据层",
+              tech: "MySQL / PostgreSQL / Milvus / Redis",
+              desc: "数据库调优、向量检索、RAG 知识库、缓存与并发控制",
+            },
+            {
+              icon: "📊",
+              title: "深度学习",
+              tech: "Transformer / LoRA / RLHF / TensorRT",
+              desc: "模型微调、剪枝量化、知识蒸馏、端侧部署",
+            },
+            {
+              icon: "🔧",
+              title: "工程化",
+              tech: "Docker / Git / Linux / WSL2 / Nginx / PM2",
+              desc: "容器化部署、CI/CD、云服务器运维",
+            },
+            {
+              icon: "🤖",
+              title: "AI 辅助编程",
+              tech: "Cursor / Claude Code / Codex / Trae",
+              desc: "Vibe Coding、AI 驱动开发提效",
+            },
+          ].map((item, index) => (
+            <motion.div
+              key={item.title}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.2 + index * 0.08 }}
+              className="bg-card border border-primary/10 rounded-lg p-4 hover:border-primary/30 transition-colors"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-lg">{item.icon}</span>
+                <span className="text-foreground font-bold text-sm">{item.title}</span>
+              </div>
+              <p className="text-xs text-accent font-mono mb-2">{item.tech}</p>
+              <p className="text-xs text-foreground-secondary leading-relaxed">→ {item.desc}</p>
+            </motion.div>
+          ))}
         </div>
       </motion.section>
 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ProjectCard } from "@/components/ProjectCard";
 import { PostCard } from "@/components/PostCard";
+import { AnimeHero } from "@/components/AnimeHero";
 import { projects } from "@/data/projects";
 import { posts } from "@/data/posts";
 
@@ -30,6 +31,7 @@ export default function Home() {
     <div className="flex flex-col">
       {/* 主页横幅 */}
       <section className="relative min-h-[85vh] flex items-center justify-center px-4">
+        <AnimeHero />
         <div className="relative max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}

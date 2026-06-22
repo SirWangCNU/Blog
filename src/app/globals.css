@@ -58,6 +58,28 @@ body {
   position: relative;
 }
 
+/* 全屏背景图 - 固定定位，滚动时保持 */
+.hero-bg-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: -1;
+}
+
+.hero-bg-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+}
+
 /* 网格背景 */
 body::before {
   content: "";

@@ -30,15 +30,15 @@ export default function Home() {
 
   return (
     <div className="flex flex-col">
-      {/* 主页横幅 */}
-      <section className="relative min-h-[85vh] flex items-center justify-center px-4 overflow-hidden">
-        {/* 背景大图 */}
+      {/* 主页横幅 - 全屏背景大图 */}
+      <section className="relative min-h-[100vh] flex items-center justify-center px-4 overflow-hidden">
+        {/* 背景大图 - 全屏铺满，固定不随滚动 */}
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          className="hero-bg-fixed"
           style={{ backgroundImage: "url(/images/hero-gaming.jpg)" }}
         />
-        {/* 深色遮罩 - 保留赛博朋克氛围 */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background" />
+        {/* 深色遮罩 */}
+        <div className="hero-bg-overlay bg-gradient-to-b from-[#0b0e14]/60 via-[#0b0e14]/40 to-[#0b0e14]" />
         {/* 顶部紫蓝光晕 */}
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px]"

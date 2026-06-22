@@ -1,40 +1,28 @@
 export function Footer() {
   return (
-<<<<<<< HEAD
     <footer className="border-t border-primary/10 bg-background-secondary relative z-10">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-center md:text-left font-mono text-sm">
             <p className="text-foreground-secondary">
-              © {new Date().getFullYear()} 王景皓 · 保留所有权利
+              © {new Date().getFullYear()} 王景皓 · AI Agent 全栈开发者
             </p>
             <p className="text-foreground-secondary/50 mt-1 text-xs">
               基于 Next.js 构建 · 部署于 Ubuntu 服务器
-=======
-    <footer className="border-t border-border bg-background-secondary">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="text-center md:text-left">
-            <p className="text-foreground font-medium">MyBlog</p>
-            <p className="text-sm text-foreground-secondary mt-1">
-              © {new Date().getFullYear()} All rights reserved.
->>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
+            </p>
+            <p className="text-foreground-secondary/50 mt-1 text-xs">
+              <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer" className="hover:text-foreground-secondary transition-colors">
+                京ICP备2026036424号-1
+              </a>
             </p>
           </div>
 
           <div className="flex items-center gap-6">
             <a
-<<<<<<< HEAD
               href="https://github.com/SirWangCNU"
               target="_blank"
               rel="noopener noreferrer"
               className="text-foreground-secondary hover:text-primary transition-colors"
-=======
-              href="https://github.com/yourusername"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-foreground-secondary hover:text-foreground transition-colors"
->>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
               aria-label="GitHub"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -42,43 +30,12 @@ export function Footer() {
               </svg>
             </a>
             <a
-<<<<<<< HEAD
               href="https://cnuwang.cn"
               target="_blank"
               rel="noopener noreferrer"
               className="text-foreground-secondary hover:text-primary transition-colors font-mono text-sm"
             >
               cnuwang.cn
-=======
-              href="https://twitter.com/yourusername"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-foreground-secondary hover:text-foreground transition-colors"
-              aria-label="Twitter"
-            >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-              </svg>
-            </a>
-            <a
-              href="mailto:your@email.com"
-              className="text-foreground-secondary hover:text-foreground transition-colors"
-              aria-label="Email"
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                />
-              </svg>
->>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
             </a>
           </div>
         </div>

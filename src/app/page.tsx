@@ -8,29 +8,18 @@ import { projects } from "@/data/projects";
 import { posts } from "@/data/posts";
 
 const skills = [
-<<<<<<< HEAD
   "Python",
+  "Java",
   "FastAPI",
+  "Spring Boot 3",
   "LangChain",
+  "LangGraph",
   "Agent 开发",
-  "AIGC",
-  "Next.js",
-  "TypeScript",
+  "RAG",
+  "Milvus",
   "Docker",
   "MySQL",
   "Redis",
-  "并发编程",
-  "Linux",
-=======
-  "React",
-  "Next.js",
-  "TypeScript",
-  "Node.js",
-  "Tailwind CSS",
-  "Python",
-  "Git",
-  "Docker",
->>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
 ];
 
 export default function Home() {
@@ -39,21 +28,14 @@ export default function Home() {
 
   return (
     <div className="flex flex-col">
-<<<<<<< HEAD
       {/* 主页横幅 */}
       <section className="relative min-h-[85vh] flex items-center justify-center px-4">
-=======
-      {/* Hero Section */}
-      <section className="relative min-h-[80vh] flex items-center justify-center px-4">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
->>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
         <div className="relative max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-<<<<<<< HEAD
             {/* 终端卡片 */}
             <div className="mb-8 inline-block">
               <div className="bg-card border border-primary/20 rounded-lg px-6 py-4 text-left font-mono text-sm">
@@ -70,10 +52,10 @@ export default function Home() {
                   <span className="text-primary">{">"}</span> 姓名：王景皓
                 </div>
                 <div className="text-foreground">
-                  <span className="text-primary">{">"}</span> 职位：Agent 全栈开发者 · AIGC 架构师
+                  <span className="text-primary">{">"}</span> 学历：首都师范大学 · 计算机技术（硕士）
                 </div>
                 <div className="text-foreground">
-                  <span className="text-primary">{">"}</span> 方向：AI Agent · 多模型调度 · 并发架构
+                  <span className="text-primary">{">"}</span> 方向：AI Agent · AIGC 全链路 · 多模型调度
                 </div>
                 <div className="text-foreground">
                   <span className="text-primary">{">"}</span> 状态：<span className="text-primary">在线</span>
@@ -89,9 +71,11 @@ export default function Home() {
             </h1>
             <p className="text-lg text-foreground-secondary max-w-2xl mx-auto mb-8 font-mono leading-relaxed">
               <span className="text-primary">/* </span>
-              专注于 AI Agent 应用开发与 AIGC 全链路架构设计。
+              AI Agent 全栈开发者 · AIGC 架构师。
               <br />
-              擅长多模型动态调度、并发任务编排、意图驱动工作流系统。
+              专注多模型动态调度、并发任务编排、意图驱动工作流系统。
+              <br />
+              自动驾驶农机感知与决策研究。
               <span className="text-primary"> */</span>
             </p>
 
@@ -100,74 +84,32 @@ export default function Home() {
               <Link
                 href="/projects"
                 className="px-8 py-3 border border-primary/40 text-primary rounded font-mono hover:bg-primary/10 transition-colors"
-=======
-            {/* Avatar */}
-            <div className="mb-8">
-              <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-3xl font-bold shadow-lg">
-                👋
-              </div>
-            </div>
-
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground mb-4">
-              Hi, 我是{" "}
-              <span className="text-primary">王景皓</span>
-            </h1>
-            <p className="text-xl sm:text-2xl text-foreground-secondary mb-2">
-              Agent 全栈开发者
-            </p>
-            <p className="text-lg text-foreground-secondary max-w-2xl mx-auto mb-8">
-              热爱技术，专注于构建智能化的 Agent应用。在这里分享我的项目、思考和学习笔记。
-            </p>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
-                href="/projects"
-                className="px-8 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-hover transition-colors shadow-lg shadow-primary/25"
->>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
               >
                 查看项目
               </Link>
               <Link
                 href="/blog"
-<<<<<<< HEAD
                 className="px-8 py-3 border border-primary/40 text-primary rounded font-mono hover:bg-primary/10 transition-colors"
-=======
-                className="px-8 py-3 border border-border text-foreground rounded-lg font-medium hover:bg-background-secondary transition-colors"
->>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
               >
                 阅读博客
               </Link>
             </div>
           </motion.div>
 
-<<<<<<< HEAD
           {/* 技能标签 */}
-=======
-          {/* Skills */}
->>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-<<<<<<< HEAD
             className="mt-16 flex flex-wrap justify-center gap-2"
-=======
-            className="mt-16 flex flex-wrap justify-center gap-3"
->>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
           >
             {skills.map((skill, index) => (
               <motion.span
                 key={skill}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-<<<<<<< HEAD
                 transition={{ duration: 0.3, delay: 0.5 + index * 0.06 }}
                 className="px-3 py-1.5 rounded font-mono text-xs tag-hacker cursor-default"
-=======
-                transition={{ duration: 0.3, delay: 0.5 + index * 0.1 }}
-                className="px-4 py-2 bg-background-secondary rounded-full text-sm font-medium text-foreground-secondary border border-border hover:border-primary/30 hover:text-primary transition-all cursor-default"
->>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
               >
                 {skill}
               </motion.span>
@@ -176,15 +118,14 @@ export default function Home() {
         </div>
       </section>
 
-<<<<<<< HEAD
       {/* 数据统计 */}
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
-            { label: "项目经验", value: "3+", icon: "🚀" },
+            { label: "实习经历", value: "2段", icon: "💼" },
             { label: "技术文章", value: `${posts.length}+`, icon: "📝" },
             { label: "并发任务", value: "100+", icon: "⚡" },
-            { label: "服务用户", value: "100+", icon: "👥" },
+            { label: "发明专利", value: "1项", icon: "📜" },
           ].map((stat, index) => (
             <motion.div
               key={stat.label}
@@ -203,9 +144,6 @@ export default function Home() {
       </section>
 
       {/* 精选项目 */}
-=======
-      {/* Featured Projects */}
->>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
       <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div
@@ -215,17 +153,10 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             className="text-center mb-12"
           >
-<<<<<<< HEAD
             <h2 className="text-2xl font-bold text-foreground mb-2 font-mono">
               ✨ 精选项目
             </h2>
             <p className="text-foreground-secondary text-sm">
-=======
-            <h2 className="text-3xl font-bold text-foreground mb-4">
-              ✨ 精选项目
-            </h2>
-            <p className="text-foreground-secondary">
->>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
               这些是我最引以为傲的作品
             </p>
           </motion.div>
@@ -245,38 +176,15 @@ export default function Home() {
           >
             <Link
               href="/projects"
-<<<<<<< HEAD
               className="inline-flex items-center gap-2 text-primary hover:text-primary-hover font-mono text-sm transition-colors"
             >
               查看所有项目 →
-=======
-              className="inline-flex items-center gap-2 text-primary hover:text-primary-hover font-medium transition-colors"
-            >
-              查看所有项目
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 8l4 4m0 0l-4 4m4-4H3"
-                />
-              </svg>
->>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
             </Link>
           </motion.div>
         </div>
       </section>
 
-<<<<<<< HEAD
       {/* 最新博客 */}
-=======
-      {/* Latest Posts */}
->>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
       <section className="py-20 px-4 bg-background-secondary">
         <div className="max-w-4xl mx-auto">
           <motion.div
@@ -286,17 +194,10 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             className="text-center mb-12"
           >
-<<<<<<< HEAD
             <h2 className="text-2xl font-bold text-foreground mb-2 font-mono">
               📝 最新技术文章
             </h2>
             <p className="text-foreground-secondary text-sm">
-=======
-            <h2 className="text-3xl font-bold text-foreground mb-4">
-              📝 最新博客
-            </h2>
-            <p className="text-foreground-secondary">
->>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
               记录技术思考与学习笔记
             </p>
           </motion.div>
@@ -316,33 +217,13 @@ export default function Home() {
           >
             <Link
               href="/blog"
-<<<<<<< HEAD
               className="inline-flex items-center gap-2 text-primary hover:text-primary-hover font-mono text-sm transition-colors"
             >
               查看所有文章 →
-=======
-              className="inline-flex items-center gap-2 text-primary hover:text-primary-hover font-medium transition-colors"
-            >
-              查看所有文章
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 8l4 4m0 0l-4 4m4-4H3"
-                />
-              </svg>
->>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
             </Link>
           </motion.div>
         </div>
       </section>
-<<<<<<< HEAD
 
       {/* 技术栈 */}
       <section className="py-20 px-4">
@@ -366,33 +247,33 @@ export default function Home() {
             {[
               {
                 category: "AI / Agent",
-                items: ["LangChain", "LangGraph", "OpenAI SDK", "RAG", "向量数据库"],
+                items: ["LangChain", "LangGraph", "Spring AI", "RAG", "MCP"],
                 icon: "🤖",
               },
               {
                 category: "后端开发",
-                items: ["Python", "FastAPI", "Node.js", "MySQL", "Redis"],
+                items: ["Python", "FastAPI", "Java", "Spring Boot 3", "Django"],
                 icon: "⚙️",
               },
               {
-                category: "前端开发",
-                items: ["React", "Next.js", "TypeScript", "Tailwind CSS"],
-                icon: "🎨",
+                category: "数据库",
+                items: ["MySQL", "PostgreSQL", "Milvus", "Redis"],
+                icon: "🗄️",
               },
               {
                 category: "AIGC 模型",
-                items: ["DeepSeek", "Seedream", "Seedance", "GPT-4", "Claude"],
+                items: ["DeepSeek", "Seedream", "Seedance", "Qwen", "GPT-5"],
                 icon: "🧠",
               },
               {
-                category: "运维部署",
-                items: ["Docker", "Nginx", "PM2", "Linux", "Git"],
-                icon: "🔧",
+                category: "深度学习",
+                items: ["Transformer", "LoRA", "RLHF", "TensorRT", "知识蒸馏"],
+                icon: "📊",
               },
               {
-                category: "架构设计",
-                items: ["并发调度", "状态机", "策略模式", "任务队列", "微服务"],
-                icon: "📐",
+                category: "工程化",
+                items: ["Docker", "Nginx", "PM2", "Git", "WSL2"],
+                icon: "🔧",
               },
             ].map((stack, index) => (
               <motion.div
@@ -422,8 +303,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-=======
->>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
     </div>
   );
 }

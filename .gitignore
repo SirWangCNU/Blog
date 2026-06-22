@@ -7,6 +7,9 @@ node_modules/
 
 # dependencies
 /node_modules
+
+# uploads
+public/uploads/
 /.pnp
 .pnp.*
 .yarn/*

@@ -30,8 +30,14 @@ export default function BlogPage() {
     <div className="min-h-screen">
       {/* Hero Banner */}
       <section className="relative h-72 flex items-center justify-center overflow-hidden">
-        {/* 背景装饰 */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background-secondary/50 to-background" />
+        {/* 背景大图 */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url(/images/hero-gaming.jpg)" }}
+        />
+        {/* 深色遮罩 */}
+        <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background" />
+        {/* 光晕装饰 */}
         <div className="absolute inset-0 opacity-20">
           <div
             className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full"

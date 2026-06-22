@@ -31,7 +31,30 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       {/* 主页横幅 */}
-      <section className="relative min-h-[85vh] flex items-center justify-center px-4">
+      <section className="relative min-h-[85vh] flex items-center justify-center px-4 overflow-hidden">
+        {/* 背景大图 */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url(/images/hero-gaming.jpg)" }}
+        />
+        {/* 深色遮罩 - 保留赛博朋克氛围 */}
+        <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background" />
+        {/* 顶部紫蓝光晕 */}
+        <div
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px]"
+          style={{
+            background: "radial-gradient(ellipse, rgba(100, 81, 246, 0.15), transparent 70%)",
+            filter: "blur(60px)",
+          }}
+        />
+        {/* 底部主色调光晕 */}
+        <div
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px]"
+          style={{
+            background: "radial-gradient(ellipse, rgba(83, 216, 168, 0.12), transparent 70%)",
+            filter: "blur(50px)",
+          }}
+        />
         <AnimeHero />
         <div className="relative max-w-4xl mx-auto text-center">
           <motion.div

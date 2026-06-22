@@ -3,189 +3,278 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ProjectCard } from "@/components/ProjectCard";
-import { PostCard } from "@/components/PostCard";
-import { AnimeHero } from "@/components/AnimeHero";
 import { TypewriterText } from "@/components/TypewriterText";
+import { Sidebar } from "@/components/Sidebar";
 import { projects } from "@/data/projects";
 import { posts } from "@/data/posts";
-
-const skills = [
-  "Python",
-  "Java",
-  "FastAPI",
-  "Spring Boot 3",
-  "LangChain",
-  "LangGraph",
-  "Agent 开发",
-  "RAG",
-  "Milvus",
-  "Docker",
-  "MySQL",
-  "Redis",
-];
+import { categories } from "@/data/posts";
 
 export default function Home() {
   const featuredProjects = projects.filter((p) => p.featured).slice(0, 3);
-  const latestPosts = posts.slice(0, 3);
+  const latestPosts = posts.slice(0, 6);
 
   return (
     <div className="flex flex-col">
-      {/* 主页横幅 - 全屏背景大图 */}
-      <section className="relative min-h-[100vh] flex items-center justify-center px-4 overflow-hidden">
-        {/* 背景大图 - 全屏铺满，固定不随滚动 */}
+      {/* ===== 全屏 Hero 头图 ===== */}
+      <section className="relative min-h-[100vh] flex flex-col items-center justify-center px-4 overflow-hidden">
+        {/* 背景大图 */}
         <div
           className="hero-bg-fixed"
           style={{ backgroundImage: "url(/images/hero-gaming.jpg)" }}
         />
         {/* 深色遮罩 */}
-        <div className="hero-bg-overlay bg-gradient-to-b from-[#0b0e14]/60 via-[#0b0e14]/40 to-[#0b0e14]" />
-        {/* 顶部紫蓝光晕 */}
-        <div
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px]"
-          style={{
-            background: "radial-gradient(ellipse, rgba(100, 81, 246, 0.15), transparent 70%)",
-            filter: "blur(60px)",
-          }}
-        />
-        {/* 底部主色调光晕 */}
-        <div
-          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px]"
-          style={{
-            background: "radial-gradient(ellipse, rgba(83, 216, 168, 0.12), transparent 70%)",
-            filter: "blur(50px)",
-          }}
-        />
-        <AnimeHero />
-        <div className="relative max-w-4xl mx-auto text-center">
+        <div className="hero-bg-overlay bg-gradient-to-b from-[#0b0e14]/50 via-[#0b0e14]/30 to-[#0b0e14]" />
+
+        {/* 内容 */}
+        <div className="relative z-10 text-center max-w-3xl mx-auto">
+          {/* 头像 */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6 }}
+            className="mb-6"
           >
-            {/* 终端卡片 */}
-            <div className="mb-8 inline-block">
-              <div className="bg-card border border-primary/20 rounded-lg px-6 py-4 text-left font-mono text-sm">
-                <div className="text-foreground-secondary/50 mb-2">
-                  <span className="text-primary">root</span>
-                  <span className="text-foreground-secondary">@</span>
-                  <span className="text-accent">dev</span>
-                  <span className="text-foreground-secondary">:</span>
-                  <span className="text-primary">~</span>
-                  <span className="text-foreground-secondary">$</span>
-                  <span className="text-foreground ml-2">cat ./个人简介.txt</span>
-                </div>
-                <div className="text-foreground">
-                  <span className="text-primary">{">"}</span> 姓名：王景皓
-                </div>
-                <div className="text-foreground">
-                  <span className="text-primary">{">"}</span> 学历：首都师范大学 · 计算机技术（硕士）
-                </div>
-                <div className="text-foreground">
-                  <span className="text-primary">{">"}</span> 方向：AI Agent · AIGC 全链路 · 多模型调度
-                </div>
-                <div className="text-foreground">
-                  <span className="text-primary">{">"}</span> 状态：<span className="text-primary">在线</span>
-                  <span className="animate-blink ml-1">█</span>
-                </div>
-              </div>
-            </div>
-
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground mb-4 font-mono">
-              王景皓
-              <span className="text-primary ml-2">/</span>
-              <span className="text-foreground-secondary text-3xl ml-2">技术博客</span>
-            </h1>
-
-            {/* 打字机副标题 */}
-            <p className="text-lg text-foreground-secondary max-w-2xl mx-auto mb-8 font-mono leading-relaxed h-14">
-              <span className="text-primary">/* </span>
-              <TypewriterText
-                texts={[
-                  "专注于 AI Agent 应用开发与 AIGC 全链路架构设计",
-                  "擅长多模型动态调度、并发任务编排、意图驱动工作流系统",
-                  "自动驾驶农机感知与决策研究",
-                  "漫剧工厂 — AIGC 全流程自动化创作平台",
-                ]}
-                typingSpeed={60}
-                deletingSpeed={30}
-                pauseTime={2500}
-              />
-              <span className="text-primary"> */</span>
-            </p>
-
-            {/* 按钮 */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
-                href="/projects"
-                className="px-8 py-3 border border-primary/40 text-primary rounded font-mono hover:bg-primary/10 transition-colors"
-              >
-                查看项目
-              </Link>
-              <Link
-                href="/blog"
-                className="px-8 py-3 border border-primary/40 text-primary rounded font-mono hover:bg-primary/10 transition-colors"
-              >
-                阅读博客
-              </Link>
+            <div className="w-28 h-28 mx-auto rounded-full bg-gradient-to-br from-primary/40 to-accent/40 flex items-center justify-center text-5xl border-2 border-primary/30 shadow-lg shadow-primary/20">
+              👨‍💻
             </div>
           </motion.div>
 
-          {/* 技能标签 */}
+          {/* 博客标题 */}
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="text-3xl sm:text-4xl font-bold text-white mb-3 font-mono"
+          >
+            欢迎来到王景皓的技术博客
+          </motion.h1>
+
+          {/* 打字机副标题 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="mt-16 flex flex-wrap justify-center gap-2"
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="text-lg text-white/80 mb-6 font-mono h-14"
           >
-            {skills.map((skill, index) => (
-              <motion.span
-                key={skill}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3, delay: 0.5 + index * 0.06 }}
-                className="px-3 py-1.5 rounded font-mono text-xs tag-hacker cursor-default"
-              >
-                {skill}
-              </motion.span>
-            ))}
+            <TypewriterText
+              texts={[
+                "专注于 AI Agent 应用开发与 AIGC 全链路架构设计",
+                "擅长多模型动态调度、并发任务编排、意图驱动工作流系统",
+                "自动驾驶农机感知与决策研究",
+                "漫剧工厂 — AIGC 全流程自动化创作平台",
+              ]}
+              typingSpeed={60}
+              deletingSpeed={30}
+              pauseTime={2500}
+            />
+          </motion.div>
+
+          {/* 社交图标 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.45 }}
+            className="flex items-center justify-center gap-4 mb-8"
+          >
+            <a
+              href="https://github.com/SirWangCNU"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-10 h-10 rounded-full bg-white/10 backdrop-blur flex items-center justify-center text-white hover:bg-primary/30 hover:text-primary transition-all border border-white/20"
+              title="GitHub"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+              </svg>
+            </a>
+            <Link
+              href="/about"
+              className="px-5 py-2 bg-white/10 backdrop-blur text-white rounded-full text-sm font-mono hover:bg-primary/30 hover:text-primary transition-all border border-white/20"
+            >
+              关于我
+            </Link>
+            <Link
+              href="/blog"
+              className="px-5 py-2 bg-primary/80 backdrop-blur text-white rounded-full text-sm font-mono hover:bg-primary transition-all border border-primary/40"
+            >
+              阅读博客
+            </Link>
           </motion.div>
         </div>
+
+        {/* 向下滚动箭头 */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
+        >
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+            className="text-white/40 text-2xl cursor-pointer"
+            onClick={() =>
+              document
+                .getElementById("content-area")
+                ?.scrollIntoView({ behavior: "smooth" })
+            }
+          >
+            ▼
+          </motion.div>
+        </motion.div>
       </section>
 
-      {/* 数据统计 */}
-      <section className="py-16 px-4">
-        <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {[
-            { label: "实习经历", value: "2段", icon: "💼" },
-            { label: "技术文章", value: `${posts.length}+`, icon: "📝" },
-            { label: "并发任务", value: "100+", icon: "⚡" },
-            { label: "发明专利", value: "1项", icon: "📜" },
-          ].map((stat, index) => (
-            <motion.div
-              key={stat.label}
+      {/* ===== 主内容区：左右分栏 ===== */}
+      <div
+        id="content-area"
+        className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12"
+      >
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* 左侧：文章列表 */}
+          <div className="flex-1 min-w-0">
+            <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-card rounded border border-primary/10 p-5 font-mono text-center hover:border-primary/30 transition-colors"
+              className="text-xl font-bold text-foreground mb-6 font-mono flex items-center gap-2"
             >
-              <div className="text-2xl mb-2">{stat.icon}</div>
-              <div className="text-2xl font-bold text-primary">{stat.value}</div>
-              <div className="text-xs text-foreground-secondary mt-1">{stat.label}</div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
+              📝 最新文章
+            </motion.h2>
 
-      {/* 精选项目 */}
-      <section className="py-20 px-4">
+            <div className="space-y-5">
+              {latestPosts.map((post, index) => (
+                <motion.article
+                  key={post.slug}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.08 }}
+                  className="group bg-card border border-primary/10 rounded-xl overflow-hidden hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5"
+                >
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    className="flex flex-col md:flex-row"
+                  >
+                    {/* 封面图 */}
+                    <div
+                      className={`relative w-full md:w-56 h-40 md:h-auto flex-shrink-0 overflow-hidden ${
+                        index % 2 === 0 ? "" : "md:order-2"
+                      }`}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-accent/10 to-transparent" />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="text-5xl opacity-20 group-hover:opacity-30 transition-opacity group-hover:scale-110 transition-transform duration-500">
+                          {post.category === "漫剧工厂"
+                            ? "🎬"
+                            : post.category === "AIGC"
+                              ? "🧠"
+                              : post.category === "前端"
+                                ? "🎨"
+                                : post.category === "后端"
+                                  ? "⚙️"
+                                  : "📝"}
+                        </div>
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+                    </div>
+
+                    {/* 内容区 */}
+                    <div className="flex-1 p-5">
+                      {/* 分类 + 标签 */}
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
+                        <span className="px-2 py-0.5 text-xs rounded-full bg-primary/15 text-primary border border-primary/30">
+                          {post.category}
+                        </span>
+                        {post.tags.slice(0, 2).map((tag) => (
+                          <span
+                            key={tag}
+                            className="px-2 py-0.5 text-xs rounded-full bg-background-secondary text-foreground-secondary border border-border"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* 标题 */}
+                      <h3 className="text-base font-bold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2">
+                        {post.title}
+                      </h3>
+
+                      {/* 摘要 */}
+                      <p className="text-sm text-foreground-secondary leading-relaxed mb-3 line-clamp-2">
+                        {post.excerpt}
+                      </p>
+
+                      {/* 日期 + 阅读时长 */}
+                      <div className="flex items-center gap-4 text-xs text-foreground-secondary/70">
+                        <span className="flex items-center gap-1">
+                          <svg
+                            className="w-3.5 h-3.5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
+                          </svg>
+                          {post.date}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <svg
+                            className="w-3.5 h-3.5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                          {post.readTime}
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.article>
+              ))}
+            </div>
+
+            {/* 查看全部 */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              className="text-center mt-8"
+            >
+              <Link
+                href="/blog"
+                className="inline-flex items-center gap-2 px-6 py-2.5 border border-primary/30 text-primary rounded-lg font-mono text-sm hover:bg-primary/10 transition-colors"
+              >
+                查看全部文章 →
+              </Link>
+            </motion.div>
+          </div>
+
+          {/* 右侧：信息栏 */}
+          <Sidebar />
+        </div>
+      </div>
+
+      {/* ===== 精选项目 ===== */}
+      <section className="py-16 px-4 bg-background-secondary">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-12"
+            className="text-center mb-10"
           >
             <h2 className="text-2xl font-bold text-foreground mb-2 font-mono">
               ✨ 精选项目
@@ -205,8 +294,8 @@ export default function Home() {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-center mt-10"
+            transition={{ delay: 0.3 }}
+            className="text-center mt-8"
           >
             <Link
               href="/projects"
@@ -218,63 +307,18 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 最新博客 */}
-      <section className="py-20 px-4 bg-background-secondary">
+      {/* ===== 技术栈 ===== */}
+      <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-2xl font-bold text-foreground mb-2 font-mono">
-              📝 最新技术文章
-            </h2>
-            <p className="text-foreground-secondary text-sm">
-              记录技术思考与学习笔记
-            </p>
-          </motion.div>
-
-          <div className="flex flex-col gap-4">
-            {latestPosts.map((post, index) => (
-              <PostCard key={post.slug} post={post} index={index} />
-            ))}
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-center mt-10"
-          >
-            <Link
-              href="/blog"
-              className="inline-flex items-center gap-2 text-primary hover:text-primary-hover font-mono text-sm transition-colors"
-            >
-              查看所有文章 →
-            </Link>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* 技术栈 */}
-      <section className="py-20 px-4">
-        <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-12"
+            className="text-center mb-10"
           >
             <h2 className="text-2xl font-bold text-foreground mb-2 font-mono">
               🛠️ 技术栈
             </h2>
-            <p className="text-foreground-secondary text-sm">
-              我日常使用的技术和工具
-            </p>
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -286,7 +330,13 @@ export default function Home() {
               },
               {
                 category: "后端开发",
-                items: ["Python", "FastAPI", "Java", "Spring Boot 3", "Django"],
+                items: [
+                  "Python",
+                  "FastAPI",
+                  "Java",
+                  "Spring Boot 3",
+                  "Django",
+                ],
                 icon: "⚙️",
               },
               {
@@ -301,7 +351,13 @@ export default function Home() {
               },
               {
                 category: "深度学习",
-                items: ["Transformer", "LoRA", "RLHF", "TensorRT", "知识蒸馏"],
+                items: [
+                  "Transformer",
+                  "LoRA",
+                  "RLHF",
+                  "TensorRT",
+                  "知识蒸馏",
+                ],
                 icon: "📊",
               },
               {
@@ -320,7 +376,9 @@ export default function Home() {
               >
                 <div className="text-sm mb-3">
                   <span className="text-xl mr-2">{stack.icon}</span>
-                  <span className="text-primary font-bold">{stack.category}</span>
+                  <span className="text-primary font-bold">
+                    {stack.category}
+                  </span>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {stack.items.map((item) => (

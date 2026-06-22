@@ -259,7 +259,6 @@ export default function AboutPage() {
             { icon: "🥉", title: "第十四届数学竞赛三等奖", year: "2022" },
             { icon: "📜", title: "一项发明专利", year: "2025" },
             { icon: "📄", title: "SCI 1区 TOP 论文在投", year: "2026" },
-            { icon: "🌐", title: "CET-4 / CET-6", year: "" },
           ].map((item, index) => (
             <motion.div
               key={item.title}

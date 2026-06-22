@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { ProjectCard } from "@/components/ProjectCard";
 import { PostCard } from "@/components/PostCard";
 import { AnimeHero } from "@/components/AnimeHero";
+import { TypewriterText } from "@/components/TypewriterText";
 import { projects } from "@/data/projects";
 import { posts } from "@/data/posts";
 
@@ -71,13 +72,21 @@ export default function Home() {
               <span className="text-primary ml-2">/</span>
               <span className="text-foreground-secondary text-3xl ml-2">技术博客</span>
             </h1>
-            <p className="text-lg text-foreground-secondary max-w-2xl mx-auto mb-8 font-mono leading-relaxed">
+
+            {/* 打字机副标题 */}
+            <p className="text-lg text-foreground-secondary max-w-2xl mx-auto mb-8 font-mono leading-relaxed h-14">
               <span className="text-primary">/* </span>
-              AI Agent 全栈开发者 · AIGC 架构师。
-              <br />
-              专注多模型动态调度、并发任务编排、意图驱动工作流系统。
-              <br />
-              自动驾驶农机感知与决策研究。
+              <TypewriterText
+                texts={[
+                  "专注于 AI Agent 应用开发与 AIGC 全链路架构设计",
+                  "擅长多模型动态调度、并发任务编排、意图驱动工作流系统",
+                  "自动驾驶农机感知与决策研究",
+                  "漫剧工厂 — AIGC 全流程自动化创作平台",
+                ]}
+                typingSpeed={60}
+                deletingSpeed={30}
+                pauseTime={2500}
+              />
               <span className="text-primary"> */</span>
             </p>
 

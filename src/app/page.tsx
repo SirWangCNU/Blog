@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { ProjectCard } from "@/components/ProjectCard";
 import { TypewriterText } from "@/components/TypewriterText";
@@ -38,8 +39,15 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             className="mb-6"
           >
-            <div className="w-28 h-28 mx-auto rounded-full bg-gradient-to-br from-primary/40 to-accent/40 flex items-center justify-center text-5xl border-2 border-primary/30 shadow-lg shadow-primary/20">
-              👨‍💻
+            <div className="w-28 h-28 mx-auto rounded-full overflow-hidden border-2 border-primary/30 shadow-lg shadow-primary/20">
+              <Image
+                src="/images/883f9f9c8dfd4f8b99cc8abe8c997333.jpg"
+                alt="王景皓头像"
+                width={112}
+                height={112}
+                className="w-full h-full object-cover"
+                priority
+              />
             </div>
           </motion.div>
 

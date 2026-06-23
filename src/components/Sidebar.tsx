@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { posts, categories } from "@/data/posts";
 
@@ -32,8 +33,14 @@ export function Sidebar() {
         transition={{ duration: 0.5 }}
         className="bg-card border border-primary/15 rounded-xl p-5 text-center"
       >
-        <div className="w-20 h-20 mx-auto mb-3 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center text-3xl border-2 border-primary/20">
-          👨‍💻
+        <div className="w-20 h-20 mx-auto mb-3 rounded-full overflow-hidden border-2 border-primary/20">
+          <Image
+            src="/images/883f9f9c8dfd4f8b99cc8abe8c997333.jpg"
+            alt="王景皓头像"
+            width={80}
+            height={80}
+            className="w-full h-full object-cover"
+          />
         </div>
         <h3 className="text-foreground font-bold text-lg mb-1">王景皓</h3>
         <p className="text-foreground-secondary text-xs mb-4">

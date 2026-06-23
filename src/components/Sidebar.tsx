@@ -37,7 +37,7 @@ export function Sidebar() {
         </div>
         <h3 className="text-foreground font-bold text-lg mb-1">王景皓</h3>
         <p className="text-foreground-secondary text-xs mb-4">
-          AI Agent 全栈开发者 · AIGC 架构师
+          AI Agent 全栈开发者
         </p>
         <div className="grid grid-cols-3 gap-2 mb-4">
           <Link

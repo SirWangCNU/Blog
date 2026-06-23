@@ -61,7 +61,7 @@ export default function AboutPage() {
             <span className="text-primary">{">"}</span> 王景皓，2001年生，中共党员，首都师范大学计算机技术硕士在读（专业前10%）。
           </p>
           <p className="mb-3">
-            <span className="text-primary">{">"}</span> AI Agent 全栈开发者 · AIGC 架构师，专注于多模型动态调度、并发任务编排、意图驱动工作流系统。
+            <span className="text-primary">{">"}</span> AI Agent 全栈开发者，专注于多模型动态调度、并发任务编排、意图驱动工作流系统。
           </p>
           <p className="mb-3">
             <span className="text-primary">{">"}</span> 曾在乐盟互动任 AIGC Agent 全栈开发实习生，主导漫剧工厂平台开发；

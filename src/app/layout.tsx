@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     default: "王景皓 - 技术博客",
     template: "%s | 王景皓",
   },
-  description: "Agent 全栈开发者 · AIGC 架构师 — 专注于 AI Agent 应用开发与系统架构设计",
+  description: "Agent 全栈开发者 — 专注于 AI Agent 应用开发与系统架构设计",
   keywords: ["Agent开发", "AIGC", "LangChain", "FastAPI", "Python", "系统架构"],
 };
 

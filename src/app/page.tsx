@@ -17,16 +17,20 @@ export default function Home() {
     <div className="flex flex-col">
       {/* ===== 全屏 Hero 头图 ===== */}
       <section className="relative min-h-[100vh] flex flex-col items-center justify-center px-4 overflow-hidden">
-        {/* 背景大图 */}
-        <div
-          className="hero-bg-fixed"
-          style={{ backgroundImage: "url(/images/hero-gaming.jpg)" }}
+        {/* 背景视频 - 仅在 Hero 区域 */}
+        <video
+          className="absolute inset-0 w-full h-full object-cover z-0"
+          src="/images/hero-beach.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
         />
         {/* 深色遮罩 */}
-        <div className="hero-bg-overlay bg-gradient-to-b from-[#0b0e14]/50 via-[#0b0e14]/30 to-[#0b0e14]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#101520]/60 via-[#101520]/40 to-[#101520] z-[1]" />
 
         {/* 内容 */}
-        <div className="relative z-10 text-center max-w-3xl mx-auto">
+        <div className="relative z-[2] text-center max-w-3xl mx-auto">
           {/* 头像 */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
@@ -124,12 +128,40 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* ===== 主内容区：左右分栏 ===== */}
+      {/* ===== 主内容区 ===== */}
       <div
         id="content-area"
-        className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12"
+        className="relative max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12"
       >
-        <div className="flex flex-col lg:flex-row gap-8">
+        {/* 彩色浮动光斑装饰 */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            animate={{ x: [0, 30, -20, 0], y: [0, -40, 20, 0] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-20 left-[10%] w-64 h-64 rounded-full opacity-[0.07]"
+            style={{ background: "radial-gradient(circle, #53d8a8, transparent 70%)", filter: "blur(40px)" }}
+          />
+          <motion.div
+            animate={{ x: [0, -25, 35, 0], y: [0, 30, -25, 0] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-40 right-[15%] w-48 h-48 rounded-full opacity-[0.06]"
+            style={{ background: "radial-gradient(circle, #64b5f6, transparent 70%)", filter: "blur(40px)" }}
+          />
+          <motion.div
+            animate={{ x: [0, 20, -30, 0], y: [0, -20, 40, 0] }}
+            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute bottom-40 left-[30%] w-56 h-56 rounded-full opacity-[0.05]"
+            style={{ background: "radial-gradient(circle, #a78bfa, transparent 70%)", filter: "blur(40px)" }}
+          />
+          <motion.div
+            animate={{ x: [0, -15, 25, 0], y: [0, 35, -15, 0] }}
+            transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute bottom-20 right-[25%] w-40 h-40 rounded-full opacity-[0.06]"
+            style={{ background: "radial-gradient(circle, #f472b6, transparent 70%)", filter: "blur(40px)" }}
+          />
+        </div>
+
+        <div className="relative z-10 flex flex-col lg:flex-row gap-8">
           {/* 左侧：文章列表 */}
           <div className="flex-1 min-w-0">
             <motion.h2
@@ -268,7 +300,7 @@ export default function Home() {
       </div>
 
       {/* ===== 精选项目 ===== */}
-      <section className="py-16 px-4 bg-background-secondary">
+      <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

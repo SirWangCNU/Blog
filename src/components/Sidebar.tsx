@@ -24,7 +24,7 @@ export function Sidebar() {
     }));
 
   return (
-    <aside className="w-full lg:w-80 flex-shrink-0 space-y-5">
+    <aside className="w-full lg:w-80 flex-shrink-0 space-y-5 lg:sticky lg:top-24 self-start">
       {/* 个人信息卡 */}
       <motion.div
         initial={{ opacity: 0, x: 20 }}

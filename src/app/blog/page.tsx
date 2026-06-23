@@ -7,9 +7,12 @@ import { Sidebar } from "@/components/Sidebar";
 import { TypewriterText } from "@/components/TypewriterText";
 import { posts, categories } from "@/data/posts";
 
+const POSTS_PER_PAGE = 3;
+
 export default function BlogPage() {
   const [selectedCategory, setSelectedCategory] = useState("全部");
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filteredPosts = useMemo(() => {
     return posts.filter((post) => {
@@ -26,14 +29,29 @@ export default function BlogPage() {
     });
   }, [selectedCategory, searchQuery]);
 
+  // 分页计算
+  const totalPages = Math.max(1, Math.ceil(filteredPosts.length / POSTS_PER_PAGE));
+  const paginatedPosts = useMemo(() => {
+    const start = (currentPage - 1) * POSTS_PER_PAGE;
+    return filteredPosts.slice(start, start + POSTS_PER_PAGE);
+  }, [filteredPosts, currentPage]);
+
+  // 筛选变化时重置到第1页
+  const handleCategoryChange = (cat: string) => { setSelectedCategory(cat); setCurrentPage(1); };
+  const handleSearchChange = (q: string) => { setSearchQuery(q); setCurrentPage(1); };
+
   return (
     <div className="min-h-screen">
       {/* Hero Banner */}
       <section className="relative h-72 flex items-center justify-center overflow-hidden">
-        {/* 背景大图 */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url(/images/hero-gaming.jpg)" }}
+        {/* 背景视频 */}
+        <video
+          className="absolute inset-0 w-full h-full object-cover"
+          src="/images/hero-coding.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
         />
         {/* 深色遮罩 */}
         <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background" />
@@ -115,7 +133,7 @@ export default function BlogPage() {
                   type="text"
                   placeholder="搜索文章..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => handleSearchChange(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 bg-card border border-border rounded-lg text-foreground placeholder:text-foreground-secondary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all font-mono text-sm"
                 />
               </div>
@@ -125,7 +143,7 @@ export default function BlogPage() {
                 {categories.map((category) => (
                   <button
                     key={category}
-                    onClick={() => setSelectedCategory(category)}
+                    onClick={() => handleCategoryChange(category)}
                     className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all ${
                       selectedCategory === category
                         ? "bg-primary text-background shadow-lg shadow-primary/25"
@@ -148,11 +166,48 @@ export default function BlogPage() {
                 transition={{ duration: 0.3 }}
                 className="space-y-5"
               >
-                {filteredPosts.map((post, index) => (
+                {paginatedPosts.map((post, index) => (
                   <PostCardBlog key={post.slug} post={post} index={index} />
                 ))}
               </motion.div>
             </AnimatePresence>
+
+            {/* 分页控件 */}
+            {totalPages > 1 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center justify-center gap-2 mt-8"
+              >
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-2 rounded-lg text-sm font-mono border border-border text-foreground-secondary hover:border-primary/30 hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                >
+                  ← 上一页
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-10 h-10 rounded-lg text-sm font-mono transition-all ${
+                      currentPage === page
+                        ? "bg-primary text-background shadow-lg shadow-primary/25"
+                        : "border border-border text-foreground-secondary hover:border-primary/30 hover:text-primary"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-2 rounded-lg text-sm font-mono border border-border text-foreground-secondary hover:border-primary/30 hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                >
+                  下一页 →
+                </button>
+              </motion.div>
+            )}
 
             {/* 空状态 */}
             {filteredPosts.length === 0 && (

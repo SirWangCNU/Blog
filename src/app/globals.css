@@ -2,34 +2,34 @@
 
 /* ===== 赛博朋克极客主题 ===== */
 :root {
-  --background: #0b0e14;
-  --background-secondary: #111622;
-  --foreground: #c5cdd9;
-  --foreground-secondary: #6b7a8d;
+  --background: #101520;
+  --background-secondary: #161d2e;
+  --foreground: #dce4ed;
+  --foreground-secondary: #8a9bb5;
   --primary: #53d8a8;
   --primary-hover: #6ee7b7;
   --accent: #64b5f6;
-  --border: #1a2233;
-  --card: #0f1420;
-  --card-hover: #161d2e;
-  --code-bg: #111622;
-  --header-bg: rgba(11, 14, 20, 0.92);
+  --border: #1e2a3d;
+  --card: #141c2b;
+  --card-hover: #1a2438;
+  --code-bg: #161d2e;
+  --header-bg: rgba(16, 21, 32, 0.92);
   --glow: 0 0 12px rgba(83, 216, 168, 0.25);
 }
 
 [data-theme="dark"] {
-  --background: #0b0e14;
-  --background-secondary: #111622;
-  --foreground: #c5cdd9;
-  --foreground-secondary: #6b7a8d;
+  --background: #101520;
+  --background-secondary: #161d2e;
+  --foreground: #dce4ed;
+  --foreground-secondary: #8a9bb5;
   --primary: #53d8a8;
   --primary-hover: #6ee7b7;
   --accent: #64b5f6;
-  --border: #1a2233;
-  --card: #0f1420;
-  --card-hover: #161d2e;
-  --code-bg: #111622;
-  --header-bg: rgba(11, 14, 20, 0.92);
+  --border: #1e2a3d;
+  --card: #141c2b;
+  --card-hover: #1a2438;
+  --code-bg: #161d2e;
+  --header-bg: rgba(16, 21, 32, 0.92);
 }
 
 @theme inline {
@@ -58,16 +58,33 @@ body {
   position: relative;
 }
 
-/* 全屏背景图 - 固定定位，滚动时保持 */
+/* content-area 内文字突出 */
+#content-area .text-foreground { color: #e2e8f0; }
+#content-area .text-foreground-secondary { color: #a0aec0; }
+#content-area .text-foreground-secondary\/70 { color: rgba(160, 174, 192, 0.7); }
+#content-area .bg-card { background-color: rgba(15, 20, 32, 0.6); }
+#content-area .bg-background-secondary { background-color: rgba(15, 20, 32, 0.4); }
+#content-area .border-primary\/10 { border-color: rgba(83, 216, 168, 0.15); }
+#content-area .border-primary\/30 { border-color: rgba(83, 216, 168, 0.3); }
+#content-area .border-border { border-color: rgba(83, 216, 168, 0.12); }
+#content-area .text-primary { color: #53d8a8; }
+#content-area .bg-primary\/15 { background-color: rgba(83, 216, 168, 0.15); }
+#content-area .bg-primary\/10 { background-color: rgba(83, 216, 168, 0.1); }
+#content-area .border-primary\/20 { border-color: rgba(83, 216, 168, 0.2); }
+#content-area .hover\:text-primary:hover { color: #6ee7b7; }
+#content-area .hover\:border-primary\/30:hover { border-color: rgba(83, 216, 168, 0.35); }
+#content-area .hover\:bg-primary\/10:hover { background-color: rgba(83, 216, 168, 0.12); }
+#content-area .shadow-primary\/5 { box-shadow: 0 4px 6px -1px rgba(83, 216, 168, 0.08); }
+#content-area .hover\:shadow-primary\/5:hover { box-shadow: 0 4px 6px -1px rgba(83, 216, 168, 0.1); }
+
+/* 全屏背景图/视频 - 固定定位，滚动时保持 */
 .hero-bg-fixed {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  object-fit: cover;
   z-index: -1;
 }
 

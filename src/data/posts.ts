@@ -491,6 +491,275 @@ DIRECTOR NOTES:
 `,
   },
   {
+    slug: "rabbitmq-complete-guide",
+    title: "RabbitMQ 完全指南：核心概念、高级特性与生产实践",
+    excerpt:
+      "从 AMQP 协议原理到交换机路由、消息确认、死信队列、延迟队列，构建高可用异步消息系统的完整指南。",
+    date: "2026-06-24",
+    readTime: "18 分钟",
+    tags: ["RabbitMQ", "消息队列", "分布式系统", "微服务", "后端"],
+    category: "后端",
+    content: `
+## 什么是 RabbitMQ
+
+RabbitMQ 是一个开源的**消息代理（Message Broker）**，实现了高级消息队列协议（AMQP）。它在分布式系统中承担异步通信枢纽的角色，核心价值在于**解耦、异步、削峰、可靠**。
+
+- **解耦**：生产者和消费者互不依赖，独立部署
+- **异步**：主流程不阻塞，耗时操作丢给消费者
+- **削峰**：突发流量由队列缓冲，保护下游服务
+- **可靠**：消息持久化 + 确认机制，防丢失
+
+---
+
+## 核心组件
+
+### Producer（生产者）
+
+发送消息到交换机的应用。生产者不直接操作队列，而是将消息交给 Exchange，由 Exchange 决定路由规则。
+
+\`\`\`python
+import pika
+
+connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+channel = connection.channel()
+channel.queue_declare(queue='order_queue')
+
+channel.basic_publish(
+    exchange='',
+    routing_key='order_queue',
+    body='{"order_id": 12345, "status": "created"}'
+)
+connection.close()
+\`\`\`
+
+### Consumer（消费者）
+
+从队列取消息并处理。推荐**手动确认**，确保消息处理完成后才从队列移除。
+
+\`\`\`python
+def callback(ch, method, properties, body):
+    print(f" [x] Received {body.decode()}")
+    process_order(body.decode())
+    ch.basic_ack(delivery_tag=method.delivery_tag)
+
+channel.basic_qos(prefetch_count=1)
+channel.basic_consume(queue='order_queue', on_message_callback=callback)
+channel.start_consuming()
+\`\`\`
+
+### Queue（队列）
+
+消息的存储缓冲区，FIFO 顺序。关键属性：
+
+- **durable**：持久化，RabbitMQ 重启后保留
+- **exclusive**：仅限当前连接
+- **auto_delete**：所有消费者断开后自动删除
+
+\`\`\`python
+channel.queue_declare(
+    queue='important_tasks',
+    durable=True,
+    arguments={
+        'x-message-ttl': 60000,      # 消息过期时间 60s
+        'x-max-length': 10000,        # 队列最大长度
+        'x-overflow': 'reject-publish' # 溢出策略
+    }
+)
+\`\`\`
+
+---
+
+## Exchange 四种类型
+
+交换机是 RabbitMQ 的路由核心，生产者发消息到 Exchange，Exchange 根据类型和路由键分发到队列。
+
+### Direct Exchange — 精确匹配
+
+路由键完全一致才投递。适合点对点精确路由。
+
+\`\`\`python
+channel.exchange_declare(exchange='direct_logs', exchange_type='direct')
+channel.queue_bind(exchange='direct_logs', queue='error_queue', routing_key='error')
+channel.basic_publish(exchange='direct_logs', routing_key='error', body='DB connection failed')
+\`\`\`
+
+### Fanout Exchange — 广播
+
+忽略路由键，消息广播到所有绑定队列。适合日志广播、事件通知。
+
+\`\`\`python
+channel.exchange_declare(exchange='logs', exchange_type='fanout')
+channel.basic_publish(exchange='logs', routing_key='', body='Log for all systems')
+\`\`\`
+
+### Topic Exchange — 通配符匹配
+
+路由键用 \`.\` 分隔，支持 \`*\`（匹配一个词）和 \`#\`（匹配零或多个词）。
+
+\`\`\`python
+channel.exchange_declare(exchange='topic_logs', exchange_type='topic')
+channel.queue_bind(exchange='topic_logs', queue='critical_queue', routing_key='*.critical')
+channel.queue_bind(exchange='topic_logs', queue='order_queue', routing_key='order.#')
+channel.basic_publish(exchange='topic_logs', routing_key='payment.critical', body='Payment timeout')
+\`\`\`
+
+### Headers Exchange — 头部属性匹配
+
+根据消息头部键值对匹配，不依赖路由键。支持 \`x-match=all\`（全匹配）和 \`x-match=any\`（任一匹配）。
+
+---
+
+## 消息确认机制
+
+消息确认（ACK）是防丢消息的核心手段。
+
+| 模式 | 行为 | 风险 |
+|------|------|------|
+| auto_ack=True | 收到即确认 | 消费者崩溃 → 消息丢失 |
+| auto_ack=False | 处理完手动 ack | 安全，推荐 |
+
+\`\`\`python
+def callback(ch, method, properties, body):
+    try:
+        process_message(body)
+        ch.basic_ack(delivery_tag=method.delivery_tag)
+    except Exception:
+        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+\`\`\`
+
+**预取数量**控制消费者并行度：
+
+\`\`\`python
+channel.basic_qos(prefetch_count=1)  # 一次只拿一条，处理完再拿下一条
+\`\`\`
+
+---
+
+## 消息持久化
+
+防丢消息的第二道防线——队列和消息都标记持久化：
+
+\`\`\`python
+# 队列持久化
+channel.queue_declare(queue='durable_queue', durable=True)
+
+# 消息持久化
+channel.basic_publish(
+    exchange='',
+    routing_key='durable_queue',
+    body='Important message',
+    properties=pika.BasicProperties(delivery_mode=2)  # 2 = persistent
+)
+\`\`\`
+
+---
+
+## 死信队列（DLX）
+
+消息被拒绝、过期或队列满时，可路由到死信交换机，避免消息直接丢弃。
+
+\`\`\`python
+# 声明死信交换机和队列
+channel.exchange_declare(exchange='dlx', exchange_type='direct')
+channel.queue_declare(queue='dead_letter_queue')
+channel.queue_bind(exchange='dlx', queue='dead_letter_queue', routing_key='dead')
+
+# 主队列绑定死信交换机
+channel.queue_declare(
+    queue='main_queue',
+    arguments={
+        'x-dead-letter-exchange': 'dlx',
+        'x-dead-letter-routing-key': 'dead'
+    }
+)
+\`\`\`
+
+典型用途：
+- 消费者多次拒绝 → 进入死信队列人工处理
+- 消息 TTL 过期 → 延迟任务的实现基础
+
+---
+
+## 延迟队列
+
+两种实现方式：
+
+### 1. TTL + DLX 组合
+
+消息设置 TTL，过期后进入死信队列，实现延迟效果。
+
+### 2. 延迟插件
+
+安装 \`rabbitmq_delayed_message_exchange\` 插件：
+
+\`\`\`python
+channel.exchange_declare(
+    exchange='delayed_exchange',
+    exchange_type='x-delayed-message',
+    arguments={'x-delayed-type': 'direct'}
+)
+
+channel.basic_publish(
+    exchange='delayed_exchange',
+    routing_key='delayed_queue',
+    body='Delayed message',
+    properties=pika.BasicProperties(headers={'x-delay': 5000})  # 延迟 5 秒
+)
+\`\`\`
+
+---
+
+## 生产环境实践
+
+### 订单处理系统
+
+\`\`\`
+用户下单 → [order_queue] → 库存服务扣减库存
+                          → 通知服务发确认邮件
+                          → 积分服务增加积分
+\`\`\`
+
+### 日志收集
+
+\`\`\`
+各服务 → [logs exchange (fanout)] → ES 索引队列 → Elasticsearch
+                                    → 告警队列 → 告警服务
+                                    → 归档队列 → S3 存储
+\`\`\`
+
+---
+
+## 最佳实践清单
+
+- ✅ **手动确认**，不用 auto_ack
+- ✅ **队列 + 消息双持久化**
+- ✅ **prefetch_count 按消费者能力设置**
+- ✅ **死信队列兜底**，避免消息黑洞
+- ✅ **监控队列深度**，用 RabbitMQ Management UI 或 Prometheus
+- ✅ **连接池复用**，避免频繁建连
+- ✅ **幂等消费**，同一消息处理多次结果一致
+
+---
+
+## 常见问题
+
+**Q: 消息丢失怎么办？**
+A: 队列 durable + 消息 delivery_mode=2 + 手动 ack + 镜像队列。
+
+**Q: 消费者处理太慢？**
+A: 增加消费者实例，调整 prefetch_count，优化消费逻辑。
+
+**Q: 消息顺序性？**
+A: 单队列单消费者保证顺序；多消费者需要业务层排序。
+
+---
+
+## 总结
+
+RabbitMQ 是成熟的消息队列方案，适用于异步处理、系统解耦、流量削峰等场景。掌握 Exchange 路由、消息确认、持久化、死信队列四个核心点，就能构建可靠的异步消息系统。
+  `,
+  },
+  {
     slug: "multimodal-rag-architecture",
     title: "多模态 RAG 系统架构设计：从文本检索到图文联合理解",
     excerpt:
@@ -619,4 +888,4 @@ Suspense 允许你将页面拆分为独立的流式块，先发送 shell，再�
   },
 ];
 
-export const categories = ["全部", "漫剧工厂", "前端", "后端", "AIGC", "工具"];
+export const categories = ["全部", "漫剧工厂", "前端", "后端", "AIGC", "消息队列", "工具"];

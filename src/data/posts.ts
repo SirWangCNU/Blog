@@ -886,6 +886,513 @@ Suspense 允许你将页面拆分为独立的流式块，先发送 shell，再�
 4. 避免在 Server Component 中使用 useState/useEffect
     `,
   },
+  {
+    slug: "docker-complete-guide",
+    title: "Docker 完全指南：容器化技术从入门到生产实践",
+    excerpt:
+      "理解容器化本质、掌握 Docker 核心命令、镜像构建、Compose 编排、网络与数据卷管理，以及生产环境最佳实践。",
+    date: "2026-06-24",
+    readTime: "20 分钟",
+    tags: ["Docker", "容器化", "DevOps", "微服务", "运维"],
+    category: "后端",
+    content: `
+## 为什么需要 Docker
+
+传统部署的痛点：开发环境跑得好好的，上了生产就挂——操作系统不同、依赖版本冲突、缺系统库。Docker 的核心价值就是**把应用和它的运行环境打包成一个不可变的单元**，在任何支持 Docker 的机器上都能一致运行。
+
+### 核心价值
+
+- **环境一致性**：开发、测试、生产用同一个镜像，消除"在我机器上能跑"
+- **秒级部署**：容器启动毫秒级，比虚拟机快 10-100 倍
+- **资源高效**：共享宿主机内核，无需 Guest OS，内存和 CPU 开销极低
+- **不可变基础设施**：镜像一旦构建完成就不会变，部署可预测、回滚简单
+
+---
+
+## 容器 vs 虚拟机
+
+\`\`\`
+┌─────────────────────────────────────────────────┐
+│              虚拟机 (VM)                         │
+│  ┌──────┐ ┌──────┐ ┌──────┐                    │
+│  │ App1 │ │ App2 │ │ App3 │                    │
+│  │Bins/ │ │Bins/ │ │Bins/ │                    │
+│  │Libs  │ │Libs  │ │Libs  │                    │
+│  ├──────┤ ├──────┤ ├──────┤                    │
+│  │Guest │ │Guest │ │Guest │  ← 每个 VM 一个 OS │
+│  │  OS  │ │  OS  │ │  OS  │                    │
+│  └──────┘ └──────┘ └──────┘                    │
+│  ┌──────────────────────────┐                  │
+│  │      Hypervisor          │                  │
+│  └──────────────────────────┘                  │
+│  ┌──────────────────────────┐                  │
+│  │      Host OS             │                  │
+│  └──────────────────────────┘                  │
+└─────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────┐
+│              容器 (Container)                    │
+│  ┌──────┐ ┌──────┐ ┌──────┐                    │
+│  │ App1 │ │ App2 │ │ App3 │                    │
+│  │Bins/ │ │Bins/ │ │Bins/ │                    │
+│  │Libs  │ │Libs  │ │Libs  │                    │
+│  └──────┘ └──────┘ └──────┘                    │
+│  ┌──────────────────────────┐                  │
+│  │      Docker Engine       │                  │
+│  └──────────────────────────┘                  │
+│  ┌──────────────────────────┐                  │
+│  │      Host OS             │                  │
+│  └──────────────────────────┘                  │
+└─────────────────────────────────────────────────┘
+\`\`\`
+
+| 维度 | 虚拟机 | 容器 |
+|------|--------|------|
+| 启动时间 | 分钟级 | 毫秒级 |
+| 资源占用 | GB 级 | MB 级 |
+| 隔离级别 | 强（硬件级） | 中（进程级） |
+| 镜像大小 | GB 级 | MB~百 MB |
+| 密度 | 单机 10+ 个 | 单机数百个 |
+
+---
+
+## 核心概念
+
+### Image（镜像）
+
+只读的模板，包含应用代码、运行时、库、环境变量。镜像用**分层存储**，每一层只记录差异，多个镜像共享相同层，节省磁盘。
+
+### Container（容器）
+
+镜像的运行实例。容器在镜像之上加了一个可写层，进程隔离但共享宿主机内核。容器停止后可写层默认丢失（除非挂载了数据卷）。
+
+### Dockerfile
+
+构建镜像的配方文件，每一行指令生成一个只读层。
+
+### Registry（镜像仓库）
+
+存储和分发镜像。Docker Hub 是公共仓库，企业通常用私有仓库（Harbor、阿里云 ACR）。
+
+---
+
+## Dockerfile 实战
+
+### Node.js 应用
+
+\`\`\`dockerfile
+# 基础镜像
+FROM node:20-alpine
+
+# 工作目录
+WORKDIR /app
+
+# 先复制依赖文件（利用缓存层）
+COPY package*.json ./
+RUN npm ci --only=production
+
+# 复制源码
+COPY . .
+
+# 构建
+RUN npm run build
+
+# 暴露端口
+EXPOSE 3000
+
+# 启动命令
+CMD ["node", "dist/index.js"]
+\`\`\`
+
+### Python Flask 应用
+
+\`\`\`dockerfile
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 5000
+
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "app:app"]
+\`\`\`
+
+### 多阶段构建（Go 应用）
+
+\`\`\`dockerfile
+# 构建阶段
+FROM golang:1.22 AS builder
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 go build -o server .
+
+# 运行阶段（只复制二进制）
+FROM alpine:3.19
+RUN apk --no-cache add ca-certificates
+COPY --from=builder /app/server /server
+EXPOSE 8080
+CMD ["/server"]
+\`\`\`
+
+多阶段构建的关键：构建阶段用完整 SDK 镜像（可能 1GB+），运行阶段用最小基础镜像（可能 10MB），最终镜像只包含编译产物。
+
+---
+
+## 常用命令速查
+
+### 镜像操作
+
+\`\`\`bash
+# 构建镜像
+docker build -t myapp:1.0 .
+
+# 查看本地镜像
+docker images
+
+# 推送到仓库
+docker push myregistry/myapp:1.0
+
+# 从仓库拉取
+docker pull nginx:alpine
+
+# 删除镜像
+docker rmi myapp:1.0
+
+# 清理无用镜像
+docker image prune -a
+\`\`\`
+
+### 容器操作
+
+\`\`\`bash
+# 运行容器
+docker run -d -p 8080:3000 --name myapp myapp:1.0
+
+# 查看运行中的容器
+docker ps
+
+# 查看所有容器（包括已停止）
+docker ps -a
+
+# 进入容器
+docker exec -it myapp /bin/sh
+
+# 查看日志
+docker logs -f myapp
+
+# 停止/启动/重启
+docker stop myapp
+docker start myapp
+docker restart myapp
+
+# 删除容器
+docker rm myapp
+
+# 清理所有停止的容器
+docker container prune
+\`\`\`
+
+### 调试
+
+\`\`\`bash
+# 查看容器资源占用
+docker stats
+
+# 查看容器详细信息
+docker inspect myapp
+
+# 查看容器内进程
+docker top myapp
+
+# 复制文件
+docker cp myapp:/app/logs ./logs
+\`\`\`
+
+---
+
+## Docker Compose
+
+多容器应用的编排工具，用一个 YAML 文件定义所有服务。
+
+### 完整示例：Web + Redis + Nginx
+
+\`\`\`yaml
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - REDIS_HOST=redis
+      - NODE_ENV=production
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - app-net
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - app-net
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - web
+    restart: unless-stopped
+    networks:
+      - app-net
+
+volumes:
+  redis-data:
+
+networks:
+  app-net:
+    driver: bridge
+\`\`\`
+
+### Compose 常用命令
+
+\`\`\`bash
+# 启动所有服务
+docker compose up -d
+
+# 查看服务状态
+docker compose ps
+
+# 查看日志
+docker compose logs -f web
+
+# 重新构建并启动
+docker compose up -d --build
+
+# 停止并删除
+docker compose down
+
+# 停止并删除，包括数据卷
+docker compose down -v
+\`\`\`
+
+---
+
+## 网络模式
+
+Docker 提供三种主要网络驱动：
+
+### Bridge（默认）
+
+容器各自拥有独立网络栈，通过 docker0 网桥互通。适合单机多容器通信。
+
+\`\`\`bash
+# 创建自定义网络
+docker network create my-net
+
+# 容器加入指定网络
+docker run -d --network my-net --name app1 myapp
+\`\`\`
+
+同一自定义网络中的容器可以用**容器名**作为域名互相访问，无需知道 IP。
+
+### Host
+
+容器直接使用宿主机网络栈，没有网络隔离。性能最好，但端口可能冲突。
+
+\`\`\`bash
+docker run -d --network host myapp
+\`\`\`
+
+### None
+
+没有网络，完全隔离。适合纯计算任务。
+
+---
+
+## 数据卷管理
+
+容器默认是无状态的——停止后数据丢失。数据卷解决持久化问题。
+
+### Named Volume（命名卷）
+
+\`\`\`bash
+# 创建数据卷
+docker volume create my-data
+
+# 挂载到容器
+docker run -d -v my-data:/app/data myapp
+
+# 查看所有卷
+docker volume ls
+
+# 删除卷
+docker volume rm my-data
+\`\`\`
+
+Docker 管理存储位置，推荐用于数据库等需要持久化的场景。
+
+### Bind Mount（绑定挂载）
+
+\`\`\`bash
+# 将宿主机目录挂载到容器
+docker run -d -v /host/path:/container/path myapp
+
+# 只读挂载
+docker run -d -v /host/path:/container/path:ro myapp
+\`\`\`
+
+直接映射宿主机文件，适合开发时热重载。
+
+---
+
+## 生产环境最佳实践
+
+### 1. 镜像优化
+
+- **用小基础镜像**：alpine / distroless / scratch
+- **多阶段构建**：构建和运行分离
+- **合并 RUN 指令**：减少层数
+- **.dockerignore**：排除无关文件
+
+\`\`\`bash
+# .dockerignore 示例
+node_modules
+.git
+.env
+*.md
+tests
+\`\`\`
+
+### 2. 安全加固
+
+- **不用 root 运行**：
+
+\`\`\`dockerfile
+RUN addgroup -S app && adduser -S app -G app
+USER app
+\`\`\`
+
+- **扫描漏洞**：
+
+\`\`\`bash
+docker scout cves myapp:latest
+# 或用 Trivy
+trivy image myapp:latest
+\`\`\`
+
+- **固定镜像版本**：用 \`node:20.11-alpine\` 而非 \`node:latest\`
+
+### 3. 资源限制
+
+\`\`\`bash
+# 限制 CPU 和内存
+docker run -d \
+  --cpus="1.5" \
+  --memory="512m" \
+  --memory-swap="1g" \
+  myapp
+\`\`\`
+
+### 4. 健康检查
+
+\`\`\`dockerfile
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
+  CMD curl -f http://localhost:3000/health || exit 1
+\`\`\`
+
+### 5. 日志管理
+
+\`\`\`bash
+# 限制日志大小
+docker run -d \
+  --log-opt max-size=10m \
+  --log-opt max-file=3 \
+  myapp
+\`\`\`
+
+---
+
+## 实际部署案例
+
+### Next.js 博客部署
+
+\`\`\`dockerfile
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM node:20-alpine
+WORKDIR /app
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./
+EXPOSE 3000
+CMD ["npm", "start"]
+\`\`\`
+
+\`\`\`bash
+# 构建并运行
+docker build -t blog:latest .
+docker run -d -p 3000:3000 --name blog blog:latest
+\`\`\`
+
+### MySQL + 数据持久化
+
+\`\`\`bash
+docker run -d \
+  --name mysql \
+  -e MYSQL_ROOT_PASSWORD=secret \
+  -e MYSQL_DATABASE=myapp \
+  -v mysql-data:/var/lib/mysql \
+  -p 3306:3306 \
+  mysql:8.0
+\`\`\`
+
+---
+
+## 常见问题
+
+**Q: 容器和镜像什么关系？**
+A: 镜像是只读模板（类），容器是镜像的运行实例（对象）。一个镜像可以创建多个容器。
+
+**Q: Docker 能完全替代虚拟机吗？**
+A: 不能。容器共享宿主机内核，隔离性弱于 VM。安全敏感场景（多租户）仍需 VM。但大多数应用场景容器足够。
+
+**Q: 容器数据丢了怎么办？**
+A: 用数据卷（-v）挂载持久化目录。数据库、上传文件等必须挂载卷。
+
+**Q: 镜像太大怎么减小？**
+A: 用 alpine 基础镜像 + 多阶段构建 + 清理缓存 + .dockerignore。
+
+---
+
+## 总结
+
+Docker 解决了环境一致性、部署效率、资源利用率三大问题。掌握 Dockerfile 编写、Compose 编排、网络和数据卷管理，就能应对 90% 的容器化场景。生产环境重点关注镜像优化、安全加固和资源限制。
+
+一句话总结：**Build once, Run anywhere.**
+  `,
+  },
 ];
 
 export const categories = ["全部", "漫剧工厂", "前端", "后端", "AIGC", "消息队列", "工具"];

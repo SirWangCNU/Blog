@@ -1393,6 +1393,369 @@ Docker 解决了环境一致性、部署效率、资源利用率三大问题。�
 一句话总结：**Build once, Run anywhere.**
   `,
   },
+  {
+    slug: "redis-complete-guide",
+    title: "Redis 完全指南：从内存数据库到分布式缓存架构",
+    excerpt:
+      "深入理解 Redis 数据结构、持久化机制、集群部署、缓存策略及生产环境最佳实践，掌握高性能键值存储的核心技术。",
+    date: "2026-06-25",
+    readTime: "22 分钟",
+    tags: ["Redis", "缓存", "NoSQL", "分布式系统", "后端"],
+    category: "后端",
+    content: `
+## 为什么需要 Redis
+
+传统关系型数据库在高并发场景下存在瓶颈：磁盘 I/O 慢、连接数有限、查询延迟高。Redis 作为内存键值存储，将数据放在 RAM 中操作，读写延迟降至微秒级，是解决热点数据访问、会话管理、实时计数等场景的利器。
+
+### 核心优势
+
+- **极致性能**：单机 10 万+ QPS，读写延迟 < 1ms
+- **丰富数据结构**：String、Hash、List、Set、Sorted Set、Stream、Bitmap、HyperLogLog
+- **持久化可选**：RDB 快照 + AOF 日志，兼顾性能与数据安全
+- **原生集群支持**：Sentinel 高可用 + Cluster 分片，轻松水平扩展
+- **原子操作**：单线程模型 + Lua 脚本，天然支持分布式锁和事务
+
+---
+
+## Redis 核心数据结构
+
+### String（字符串）
+
+最基础的类型，可存储字符串、整数、浮点数，最大 512MB。
+
+\`\`\`bash
+# 基础操作
+SET user:1001 "张三"
+GET user:1001
+
+# 原子计数器
+INCR article:1001:views
+INCRBY article:1001:views 10
+
+# 带过期时间
+SET session:abc123 "user_data" EX 3600
+
+# 批量操作
+MSET key1 "a" key2 "b" key3 "c"
+MGET key1 key2 key3
+\`\`\`
+
+**应用场景**：缓存、会话存储、分布式锁、计数器、限流。
+
+### Hash（哈希）
+
+字段级存取，适合存储对象，避免序列化开销。
+
+\`\`\`bash
+# 存储用户信息
+HSET user:1001 name "张三" age 28 email "zhangsan@example.com"
+HGET user:1001 name
+HGETALL user:1001
+
+# 原子更新单个字段
+HINCRBY user:1001 age 1
+HDEL user:1001 email
+\`\`\`
+
+**应用场景**：用户画像、商品详情、配置管理。
+
+### List（列表）
+
+双向链表，支持头尾操作，可做队列或栈。
+
+\`\`\`bash
+# 消息队列
+LPUSH queue:email "msg1" "msg2" "msg3"
+RPOP queue:email
+
+# 阻塞弹出（消费者等待）
+BRPOP queue:email 30
+
+# 最新 N 条记录
+LPUSH timeline:user1001 "post_202"
+LTRIM timeline:user1001 0 49
+\`\`\`
+
+**应用场景**：消息队列、最新动态、任务列表。
+
+### Set（集合）
+
+无序不重复元素，支持交集、并集、差集运算。
+
+\`\`\`bash
+# 标签系统
+SADD article:1001:tags "Redis" "缓存" "性能"
+SMEMBERS article:1001:tags
+
+# 共同关注
+SINTER user:1001:following user:1002:following
+
+# 推荐好友（差集）
+SDIFF user:1002:following user:1001:following
+\`\`\`
+
+**应用场景**：标签系统、社交关系、去重、推荐算法。
+
+### Sorted Set（有序集合）
+
+每个元素关联分数，自动排序，范围查询 O(log N)。
+
+\`\`\`bash
+# 排行榜
+ZADD leaderboard 95 "player:1001"
+ZADD leaderboard 87 "player:1002"
+ZADD leaderboard 99 "player:1003"
+
+# Top 10
+ZREVRANGE leaderboard 0 9 WITHSCORES
+
+# 范围查询
+ZRANGEBYSCORE leaderboard 90 100
+
+# 原子加分
+ZINCRBY leaderboard 5 "player:1001"
+\`\`\`
+
+**应用场景**：排行榜、延迟队列、滑动窗口限流、权重优先级队列。
+
+---
+
+## 持久化机制
+
+### RDB（Redis Database Snapshot）
+
+定时生成内存快照，二进制文件存储到磁盘。
+
+\`\`\`bash
+# redis.conf 配置
+save 900 1      # 900 秒内至少 1 次写入则触发
+save 300 10     # 300 秒内至少 10 次写入则触发
+save 60 10000   # 60 秒内至少 10000 次写入则触发
+
+# 手动触发
+BGSAVE         # 后台异步保存
+SAVE           # 同步保存（阻塞，慎用）
+\`\`\`
+
+**优点**：文件紧凑、恢复速度快、对性能影响小。
+**缺点**：两次快照间的数据可能丢失。
+
+### AOF（Append Only File）
+
+记录每条写命令，追加到日志文件。
+
+\`\`\`bash
+# redis.conf 配置
+appendonly yes
+appendfsync everysec   # 每秒同步一次（推荐）
+# appendfsync always   # 每条命令同步（最安全，性能最差）
+# appendfsync no       # 由 OS 决定（最快，安全性最差）
+
+# AOF 重写（压缩日志）
+BGREWRITEAOF
+auto-aof-rewrite-percentage 100
+auto-aof-rewrite-min-size 64mb
+\`\`\`
+
+**优点**：数据安全性高、日志可读。
+**缺点**：文件较大、恢复速度慢于 RDB。
+
+### 混合持久化（Redis 4.0+）
+
+\`\`\`bash
+aof-use-rdb-preamble yes
+\`\`\`
+
+AOF 重写时，前半部分写入 RDB 格式，后半部分追加 AOF 命令。兼顾恢复速度和数据安全性，**生产环境推荐开启**。
+
+---
+
+## 缓存策略与常见问题
+
+### 缓存穿透
+
+查询不存在的数据，请求直达数据库。
+
+**解决方案**：
+- 缓存空值：\`SET key "NULL" EX 60\`
+- 布隆过滤器：预判断 key 是否存在
+
+### 缓存击穿
+
+热点 key 过期瞬间，大量请求涌入数据库。
+
+**解决方案**：
+- 互斥锁：\`SETNX lock:key 1\`，获取锁的线程回源，其他等待
+- 逻辑过期：不设 TTL，value 中存储过期时间，异步更新
+
+### 缓存雪崩
+
+大量 key 同时过期，或 Redis 宕机，请求全部打到数据库。
+
+**解决方案**：
+- 过期时间加随机值：\`EXPIRE key (3600 + random(600))\`
+- 多级缓存：本地缓存 + Redis + 数据库
+- 集群高可用：Sentinel 或 Cluster
+
+---
+
+## Redis 集群部署
+
+### Sentinel（哨兵模式）
+
+自动故障转移，保证高可用。
+
+\`\`\`bash
+# sentinel.conf
+sentinel monitor mymaster 127.0.0.1 6379 2
+sentinel down-after-milliseconds mymaster 5000
+sentinel failover-timeout mymaster 60000
+sentinel parallel-syncs mymaster 1
+\`\`\`
+
+**架构**：1 主 + N 从 + 3 哨兵（奇数个），哨兵投票选举新 master。
+
+### Cluster（集群模式）
+
+数据分片，水平扩展。
+
+\`\`\`bash
+# 创建 6 节点集群（3 主 3 从）
+redis-cli --cluster create \
+  127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 \
+  127.0.0.1:7003 127.0.0.1:7004 127.0.0.1:7005 \
+  --cluster-replicas 1
+
+# 查看集群状态
+redis-cli -c -p 7000 CLUSTER INFO
+redis-cli -c -p 7000 CLUSTER NODES
+\`\`\`
+
+**原理**：16384 个哈希槽（slot），CRC16(key) % 16384 决定数据落在哪个节点。
+
+---
+
+## 实战：Docker Compose 部署 Redis
+
+\`\`\`yaml
+version: '3.8'
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    command: redis-server /usr/local/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    restart: unless-stopped
+    networks:
+      - app-net
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: redis-commander
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+volumes:
+  redis-data:
+
+networks:
+  app-net:
+    driver: bridge
+\`\`\`
+
+\`\`\`bash
+# 启动
+docker compose up -d
+
+# 连接测试
+docker exec -it redis redis-cli
+127.0.0.1:6379> PING
+PONG
+\`\`\`
+
+---
+
+## 生产环境最佳实践
+
+### 内存管理
+
+\`\`\`bash
+# 设置最大内存
+maxmemory 4gb
+maxmemory-policy allkeys-lru
+
+# 内存淘汰策略
+# volatile-lru    -> 对设过期时间的 key 执行 LRU
+# allkeys-lru     -> 对所有 key 执行 LRU（推荐）
+# volatile-ttl    -> 优先淘汰 TTL 短的 key
+# noeviction      -> 内存满时拒绝写入
+\`\`\`
+
+### 安全加固
+
+\`\`\`bash
+# 设置密码
+requirepass your_strong_password
+
+# 禁用危险命令
+rename-command FLUSHALL ""
+rename-command FLUSHDB ""
+rename-command CONFIG ""
+
+# 绑定地址
+bind 127.0.0.1
+protected-mode yes
+\`\`\`
+
+### 监控命令
+
+\`\`\`bash
+# 实时监控
+redis-cli MONITOR          # 查看所有命令（调试用，生产慎用）
+redis-cli INFO memory      # 内存使用详情
+redis-cli INFO stats       # 命中率、QPS 统计
+redis-cli INFO replication # 主从同步状态
+
+# 慢查询日志
+CONFIG SET slowlog-log-slower-than 10000
+CONFIG SET slowlog-max-len 128
+SLOWLOG GET 10
+\`\`\`
+
+---
+
+## 常见问题
+
+**Q: Redis 为什么这么快？**
+A: 数据在内存中 + 单线程避免上下文切换 + I/O 多路复用 + 高效数据结构。Redis 6.0+ 引入多线程 I/O 但命令执行仍单线程。
+
+**Q: Redis 和 Memcached 怎么选？**
+A: Redis 数据结构更丰富、支持持久化、原生集群。Memcached 纯缓存、多线程、内存效率略高。需要复杂数据结构或持久化选 Redis，纯简单缓存且极高并发选 Memcached。
+
+**Q: 单线程怎么利用多核？**
+A: 启动多个 Redis 实例，或使用 Redis Cluster 分片。CPU 密集型操作（如大 key 的 SORT）会阻塞，应避免。
+
+**Q: 大 key 怎么处理？**
+A: 拆分（Hash 分桶、List 分段）、异步删除（\`UNLINK\` 替代 \`DEL\`）、定期扫描清理。单个 String 不要超过 10KB，Hash/Set/List 元素不要超过 5000 个。
+
+---
+
+## 总结
+
+Redis 是后端开发的必备技能。理解数据结构选型、掌握持久化机制、合理设计缓存策略、部署高可用集群，就能充分发挥 Redis 的性能优势。生产环境重点关注内存管理、安全加固和大 key 治理。
+
+一句话总结：**数据在手，天下我有。**
+  `,
+  },
 ];
 
 export const categories = ["全部", "漫剧工厂", "前端", "后端", "AIGC", "消息队列", "工具"];

@@ -9,7 +9,7 @@ import { ThemeToggle } from "./ThemeToggle";
 const navLinks = [
   { href: "/", label: "首页" },
   { href: "/about", label: "关于" },
-  { href: "/projects", label: "项目" },
+  { href: "/projects", label: "作品集" },
   { href: "/blog", label: "博客" },
   { href: "/files", label: "文件" },
 ];

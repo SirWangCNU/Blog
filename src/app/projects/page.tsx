@@ -18,10 +18,10 @@ export default function ProjectsPage() {
         className="text-center mb-12"
       >
         <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-4 font-mono">
-          <span className="text-primary">#</span> 项目展示
+          <span className="text-primary">#</span> 作品集
         </h1>
         <p className="text-lg text-foreground-secondary">
-          这些是我参与或独立完成的项目
+          我参与和独立完成的各类项目，涵盖AI大模型、全栈开发、计算机视觉等多个领域
         </p>
       </motion.div>
 
@@ -34,7 +34,7 @@ export default function ProjectsPage() {
           className="mb-16"
         >
           <h2 className="text-xl font-bold text-foreground mb-6 font-mono">
-            <span className="text-primary">▸</span> 精选项目
+            <span className="text-primary">▸</span> 核心项目
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featured.map((project, index) => (
@@ -52,7 +52,7 @@ export default function ProjectsPage() {
           transition={{ duration: 0.6, delay: 0.4 }}
         >
           <h2 className="text-xl font-bold text-foreground mb-6 font-mono">
-            <span className="text-primary">▸</span> 其他项目
+            <span className="text-primary">▸</span> 更多作品
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {others.map((project, index) => (

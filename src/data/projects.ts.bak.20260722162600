@@ -1,0 +1,93 @@
+export interface Project {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  tags: string[];
+  github?: string;
+  demo?: string;
+  featured: boolean;
+}
+
+export const projects: Project[] = [
+  {
+    id: "6",
+    title: "青禾映画 - 面向农业的短视频生成智能体",
+    description:
+      "获Trae AI创作力大赛优秀奖，支持对话式创作和无限画布创作ComfyUI工作流，可一键生成农业科普、产品宣传等各类短视频内容，内置丰富农业素材库和风格模板，大幅降低农业内容创作门槛。",
+    image: "/projects/dashboard.svg",
+    tags: ["FastAPI", "LangGraph", "ComfyUI", "农业短视频", "Trae AI大赛优秀奖"],
+    github: "https://github.com/SirWangCNU/Qhyh_Agent",
+    demo: "https://qhyh.cnuwang.cn",
+    featured: true,
+  },
+  {
+    id: "1",
+    title: "ZCreativeFactory 漫剧工厂",
+    description:
+      "AIGC 全流程自动化漫剧创作平台。封装统一 LLM 客户端，集成 DeepSeek/Qwen/GPT-5-mini 等多种大语言模型，以及 Seedance/Sora/Wan 等 6 种视频生成模型和 Seedream/Qwen-VL/GPT-image2 等多种图像生成模型。基于 Redis 实现步骤级并发锁、WebSocket Pub/Sub 实时推送和限流指标设计，Redis 不可用时自动降级为内存存储。实现从选题→剧本→角色/场景资产→分镜→生图→生 Clip→合成成片的完整自动化流水线，支撑近百人培训课程，高峰期上百任务并行。",
+    image: "/projects/blog.svg",
+    tags: ["FastAPI", "LangChain", "AIGC", "Python", "Redis", "WebSocket"],
+    github: "https://github.com/SirWangCNU",
+    featured: true,
+  },
+  {
+    id: "7",
+    title: "GlobalVideo Agent 基于LLM的多维视频解析系统",
+    description:
+      "使用FastAPI+yt-dlp+大模型应用，实现了主流平台下的视频下载、AI内容自动总结提炼、付费观看与支付功能，支持多格式导出，可批量处理视频内容，为内容创作者提供高效的视频处理工具。",
+    image: "/projects/weather.svg",
+    tags: ["FastAPI", "yt-dlp", "大模型", "视频解析", "支付系统"],
+    github: "https://github.com/SirWangCNU",
+    featured: true,
+  },
+  {
+    id: "3",
+    title: "AgroAgent 智农信息处理平台",
+    description:
+      "全链路智农协同平台，集成农业智能问答、气象农事顾问、病虫害诊断、AI 广告视频生成。基于 FastAPI + LangGraph 构建 Skill-first 多智能体系统，通过 SkillRouter 实现 6 大场景自动路由；设计 Planner-Executor-Replan 闭环机制；集成 Milvus 向量数据库与 RAG 检索增强；采用 BM25 + 向量检索 + RRF 融合 + Reranker 混合检索方案；多工具并行执行效率提升 4.88 倍，延迟下降 79.5%。",
+    image: "/projects/dashboard.svg",
+    tags: ["FastAPI", "LangGraph", "RAG", "Milvus", "多智能体", "农业"],
+    github: "https://github.com/SirWangCNU/AgroAgentOS",
+    featured: true,
+  },
+  {
+    id: "4",
+    title: "SpringNexus AI-Agent 多功能助手",
+    description:
+      "针对现有AI应用难以处理复杂长链路任务、缺乏领域知识深度以及重启后对话状态丢失的痛点，基于Spring Boot 3和Spring AI构建的AI Agent智能体，支持多模型动态切换、MCP协议工具调用、对话状态持久化、RAG检索增强，服务重启后上下文零丢失。",
+    image: "/projects/dashboard.svg",
+    tags: ["Spring Boot 3", "Spring AI", "MCP", "RAG", "Java", "智能体"],
+    github: "https://github.com/SirWangCNU/Wjh-Ai-Agent",
+    featured: true,
+  },
+  {
+    id: "5",
+    title: "自动驾驶农机地头感知与行为决策系统",
+    description:
+      "针对农田非结构化环境，在 DeepLabV3+ 基础上引入 Coordinate Attention 与 Strip Pooling 模块强化窄长形状特征提取；设计 B&D Loss 解决边界像素分类模糊问题。采用结构化剪枝 + 知识蒸馏实现模型压缩 48.43%，TensorRT 加速使单帧推理延迟降至 47ms。利用双目相机获取点云信息，设计多级距离阈值决策机制，动态触发四阶段行为模式。",
+    image: "/projects/dashboard.svg",
+    tags: ["DeepLabV3+", "TensorRT", "Jetson", "自动驾驶", "目标检测"],
+    featured: true,
+  },
+  {
+    id: "2",
+    title: "ZCreativeAgent 漫剧助手",
+    description:
+      "移动端对话式漫剧创作助手。基于 LangChain Core 实现多轮对话上下文记忆（滑动窗口 k=20），采用 Orchestrator 模式设计 7 步引导流程（选题→剧本→资产→分镜→镜头图→Clip→合成），通过 StepResult 状态机统一管理步骤流转，Orchestrator 仅负责调度不含业务逻辑，实现流程控制与业务逻辑解耦。",
+    image: "/projects/taskmanager.svg",
+    tags: ["FastAPI", "LangChain", "Agent", "状态机", "移动端"],
+    github: "https://github.com/SirWangCNU",
+    featured: false,
+  },
+  {
+    id: "8",
+    title: "NoCode 智能零代码网页生成部署平台",
+    description:
+      "低代码/零代码网页生成与一键部署平台，支持可视化拖拽编辑、组件库复用、自动打包部署到云服务器，无需编程基础即可快速搭建上线各类网站、活动页、展示页。",
+    image: "/projects/taskmanager.svg",
+    tags: ["低代码", "React", "一键部署", "可视化编辑"],
+    github: "https://github.com/SirWangCNU",
+    featured: false,
+  },
+];

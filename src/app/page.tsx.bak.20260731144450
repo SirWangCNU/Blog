@@ -1,19 +1,18 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ProjectCard } from "@/components/ProjectCard";
 import { TypewriterText } from "@/components/TypewriterText";
 import { Sidebar } from "@/components/Sidebar";
+import { projects } from "@/data/projects";
 import { posts } from "@/data/posts";
 import { categories } from "@/data/posts";
-import { listWorks } from "@/lib/works/store";
 
-export const dynamic = "force-dynamic";
-
-export default async function Home() {
-  const works = await listWorks();
-  const featuredProjects = works.filter((p) => p.featured).slice(0, 3);
-  const latestPosts = posts.slice(0, 10);
+export default function Home() {
+  const featuredProjects = projects.filter((p) => p.featured).slice(0, 3);
+  const latestPosts = posts.slice(0, 6);
 
   return (
     <div className="flex flex-col">
@@ -170,18 +169,18 @@ export default async function Home() {
           />
         </div>
 
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-xl font-bold text-foreground mb-6 font-mono flex items-center gap-2"
-        >
-          📝 最新文章
-        </motion.h2>
-
         <div className="relative z-10 flex flex-col lg:flex-row gap-8">
           {/* 左侧：文章列表 */}
           <div className="flex-1 min-w-0">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-xl font-bold text-foreground mb-6 font-mono flex items-center gap-2"
+            >
+              📝 最新文章
+            </motion.h2>
+
             <div className="space-y-5">
               {latestPosts.map((post, index) => (
                 <motion.article

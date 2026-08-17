@@ -15,7 +15,7 @@ export interface AdminNavItem {
 
 export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { href: "/admin", label: "总览", index: "01", icon: "overview", availability: "ready" },
-  { href: "/admin/blog", label: "博客", index: "02", icon: "posts", availability: "planned" },
+  { href: "/admin/blog", label: "博客", index: "02", icon: "posts", availability: "ready" },
   { href: "/admin/works", label: "作品集", index: "03", icon: "works", availability: "ready" },
   { href: "/admin/media", label: "媒体库", index: "04", icon: "media", availability: "planned" },
   { href: "/admin/settings", label: "网站设置", index: "05", icon: "settings", availability: "planned" },

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import { deriveWorkSummary, insertMarkdownImage } from "@/lib/admin/work-editor";
 import type { Work, WorkInput } from "@/lib/works/types";
 
 interface WorkFormProps {
@@ -26,92 +26,84 @@ const DEFAULT_WORK: WorkInput = {
 };
 
 export function WorkForm({ initialWork, onSaved }: WorkFormProps) {
-  const [form, setForm] = useState<WorkInput>(DEFAULT_WORK);
-  const [tagInput, setTagInput] = useState("");
+  const [form, setForm] = useState<WorkInput>(() =>
+    initialWork
+      ? { ...DEFAULT_WORK, ...initialWork }
+      : { ...DEFAULT_WORK, tags: [], gallery: [] }
+  );
   const [saving, setSaving] = useState(false);
-  const [uploadingCover, setUploadingCover] = useState(false);
-  const [uploadingGallery, setUploadingGallery] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [preview, setPreview] = useState(false);
+  const editorRef = useRef<HTMLTextAreaElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const selectionRef = useRef({ start: 0, end: 0 });
 
   useEffect(() => {
-    if (initialWork) {
-      setForm({
-        ...DEFAULT_WORK,
-        ...initialWork,
-      });
-    }
-  }, [initialWork]);
-
-  useEffect(() => {
-    if (message) {
-      const timer = setTimeout(() => setMessage(null), 3000);
-      return () => clearTimeout(timer);
-    }
+    if (!message) return;
+    const timer = setTimeout(() => setMessage(null), 3000);
+    return () => clearTimeout(timer);
   }, [message]);
 
   const updateField = <K extends keyof WorkInput>(key: K, value: WorkInput[K]) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
+    setForm((previous) => ({ ...previous, [key]: value }));
   };
 
-  const handleUpload = useCallback(
-    async (file: File, type: "cover" | "gallery") => {
-      const setter = type === "cover" ? setUploadingCover : setUploadingGallery;
-      setter(true);
-      try {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("folder", "works");
-        const res = await fetch("/api/upload", { method: "POST", body: formData });
-        const data = await res.json();
-        if (data.success) {
-          if (type === "cover") {
-            updateField("cover", data.file.url);
-          } else {
-            updateField("gallery", [...(form.gallery || []), data.file.url]);
-          }
-          setMessage({ type: "success", text: "图片上传成功" });
-        } else {
-          setMessage({ type: "error", text: data.error || "上传失败" });
-        }
-      } catch {
-        setMessage({ type: "error", text: "上传失败" });
-      } finally {
-        setter(false);
+  const openImagePicker = () => {
+    const editor = editorRef.current;
+    selectionRef.current = editor
+      ? { start: editor.selectionStart, end: editor.selectionEnd }
+      : { start: form.content.length, end: form.content.length };
+    imageInputRef.current?.click();
+  };
+
+  const handleImageUpload = async (file: File) => {
+    setUploadingImage(true);
+    setPreview(false);
+
+    try {
+      const uploadData = new FormData();
+      uploadData.append("file", file);
+      uploadData.append("folder", "works");
+      const response = await fetch("/api/upload", { method: "POST", body: uploadData });
+      const data = await response.json();
+
+      if (!data.success) {
+        setMessage({ type: "error", text: data.error || "图片上传失败" });
+        return;
       }
-    },
-    [form.gallery]
-  );
 
-  const handleAddTag = () => {
-    const value = tagInput.trim();
-    if (!value) return;
-    if (form.tags.includes(value)) {
-      setTagInput("");
-      return;
+      const alt = file.name.replace(/\.[^.]+$/, "");
+      const insertion = insertMarkdownImage(
+        form.content,
+        selectionRef.current.start,
+        selectionRef.current.end,
+        alt,
+        data.file.url
+      );
+
+      setForm((previous) => ({
+        ...previous,
+        content: insertion.content,
+        cover: previous.cover || data.file.url,
+      }));
+      setMessage({ type: "success", text: "图片已插入正文" });
+
+      window.setTimeout(() => {
+        editorRef.current?.focus();
+        editorRef.current?.setSelectionRange(insertion.cursor, insertion.cursor);
+      }, 0);
+    } catch {
+      setMessage({ type: "error", text: "图片上传失败" });
+    } finally {
+      setUploadingImage(false);
     }
-    updateField("tags", [...form.tags, value]);
-    setTagInput("");
   };
 
-  const handleTagKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleAddTag();
-    }
-  };
-
-  const removeTag = (tag: string) => {
-    updateField("tags", form.tags.filter((t) => t !== tag));
-  };
-
-  const removeGalleryImage = (url: string) => {
-    updateField("gallery", (form.gallery || []).filter((u) => u !== url));
-  };
-
-  const handleSubmit = async (publish = false) => {
-    if (!form.title.trim() || !form.summary.trim()) {
-      setMessage({ type: "error", text: "标题和简介不能为空" });
+  const handleSubmit = async (publish: boolean) => {
+    const title = form.title.trim();
+    if (!title) {
+      setMessage({ type: "error", text: "请填写作品标题" });
       return;
     }
 
@@ -120,20 +112,25 @@ export function WorkForm({ initialWork, onSaved }: WorkFormProps) {
       const payload: WorkInput = {
         ...form,
         id: initialWork?.id,
-        status: publish ? "published" : form.status,
+        title,
+        summary: deriveWorkSummary(form.content, title),
+        status: publish ? "published" : "draft",
       };
-      const res = await fetch("/api/works", {
+      const response = await fetch("/api/works", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const data = await res.json();
-      if (data.success) {
-        setMessage({ type: "success", text: publish ? "已发布" : "已保存" });
-        onSaved(data.work);
-      } else {
+      const data = await response.json();
+
+      if (!data.success) {
         setMessage({ type: "error", text: data.error || "保存失败" });
+        return;
       }
+
+      setForm((previous) => ({ ...previous, status: payload.status, summary: payload.summary }));
+      setMessage({ type: "success", text: publish ? "作品已发布" : "草稿已保存" });
+      onSaved(data.work);
     } catch {
       setMessage({ type: "error", text: "保存失败" });
     } finally {
@@ -142,261 +139,96 @@ export function WorkForm({ initialWork, onSaved }: WorkFormProps) {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="admin-minimal-editor-v2">
       {message && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={`px-4 py-3 rounded-lg text-sm font-mono border ${
-            message.type === "success"
-              ? "bg-primary/10 text-primary border-primary/20"
-              : "bg-red-500/10 text-red-400 border-red-500/20"
-          }`}
-        >
-          {message.type === "success" ? "✓ " : "✗ "}
+        <div className="admin-form-message-v2" data-type={message.type} role="status" aria-live="polite">
           {message.text}
-        </motion.div>
+        </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* 左侧：基本信息 */}
-        <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-2">作品标题 *</label>
-            <input
-              type="text"
-              value={form.title}
-              onChange={(e) => updateField("title", e.target.value)}
-              className="w-full px-4 py-2 bg-card border border-border rounded-lg focus:outline-none focus:border-primary text-foreground"
-              placeholder="例如：青禾映画 - 农业短视频生成智能体"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-2">一句话简介 *</label>
-            <textarea
-              value={form.summary}
-              onChange={(e) => updateField("summary", e.target.value)}
-              rows={3}
-              className="w-full px-4 py-2 bg-card border border-border rounded-lg focus:outline-none focus:border-primary text-foreground resize-none"
-              placeholder="列表页展示的简短描述"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-2">分类</label>
-            <input
-              type="text"
-              value={form.category || ""}
-              onChange={(e) => updateField("category", e.target.value)}
-              className="w-full px-4 py-2 bg-card border border-border rounded-lg focus:outline-none focus:border-primary text-foreground"
-              placeholder="例如：AI Agent / 全栈开发"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-2">技术栈标签</label>
-            <div className="flex flex-wrap gap-2 mb-2">
-              {form.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-md"
-                >
-                  {tag}
-                  <button onClick={() => removeTag(tag)} className="hover:text-foreground">×</button>
-                </span>
-              ))}
-            </div>
-            <input
-              type="text"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              onKeyDown={handleTagKeyDown}
-              className="w-full px-4 py-2 bg-card border border-border rounded-lg focus:outline-none focus:border-primary text-foreground"
-              placeholder="输入标签后按回车添加"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">GitHub</label>
-              <input
-                type="url"
-                value={form.github || ""}
-                onChange={(e) => updateField("github", e.target.value)}
-                className="w-full px-4 py-2 bg-card border border-border rounded-lg focus:outline-none focus:border-primary text-foreground"
-                placeholder="https://github.com/..."
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Live Demo</label>
-              <input
-                type="url"
-                value={form.demo || ""}
-                onChange={(e) => updateField("demo", e.target.value)}
-                className="w-full px-4 py-2 bg-card border border-border rounded-lg focus:outline-none focus:border-primary text-foreground"
-                placeholder="https://..."
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">文档</label>
-              <input
-                type="url"
-                value={form.doc || ""}
-                onChange={(e) => updateField("doc", e.target.value)}
-                className="w-full px-4 py-2 bg-card border border-border rounded-lg focus:outline-none focus:border-primary text-foreground"
-                placeholder="https://..."
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-6">
-            <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
-              <input
-                type="checkbox"
-                checked={form.featured}
-                onChange={(e) => updateField("featured", e.target.checked)}
-                className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
-              />
-              精选作品
-            </label>
-            <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
-              <span>状态：</span>
-              <select
-                value={form.status}
-                onChange={(e) => updateField("status", e.target.value as "draft" | "published")}
-                className="bg-card border border-border rounded-lg px-3 py-1 text-sm focus:outline-none focus:border-primary"
-              >
-                <option value="draft">草稿</option>
-                <option value="published">已发布</option>
-              </select>
-            </label>
-          </div>
+      <section className="admin-card-v2 admin-writing-card-v2" aria-label="作品编辑器">
+        <div className="admin-writing-title-v2">
+          <label htmlFor="work-title">作品标题</label>
+          <input
+            id="work-title"
+            type="text"
+            value={form.title}
+            onChange={(event) => updateField("title", event.target.value)}
+            placeholder="输入作品标题"
+            autoComplete="off"
+          />
         </div>
 
-        {/* 右侧：封面 + 图库 */}
-        <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-2">作品封面</label>
-            <div
-              className="border-2 border-dashed border-border rounded-xl p-6 text-center hover:border-primary/60 transition-colors cursor-pointer"
-              onClick={() => document.getElementById("cover-input")?.click()}
-            >
+        <div className="admin-writing-editor-v2">
+          <div className="admin-writing-toolbar-v2">
+            <div>
+              <label htmlFor="work-content">项目正文</label>
+              <span>支持 Markdown</span>
+            </div>
+            <div className="admin-writing-tools-v2">
               <input
-                id="cover-input"
+                ref={imageInputRef}
                 type="file"
                 accept="image/*"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleUpload(file, "cover");
-                  e.target.value = "";
+                className="sr-only"
+                aria-label="选择正文图片"
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (file) void handleImageUpload(file);
+                  event.target.value = "";
                 }}
               />
-              {form.cover ? (
-                <img
-                  src={form.cover}
-                  alt="cover"
-                  className="w-full h-48 object-cover rounded-lg"
-                />
-              ) : uploadingCover ? (
-                <div className="flex items-center justify-center h-48">
-                  <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                </div>
-              ) : (
-                <div className="h-48 flex flex-col items-center justify-center text-foreground-secondary">
-                  <span className="text-3xl mb-2">🖼️</span>
-                  <span className="text-sm">点击上传封面</span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-2">作品截图</label>
-            <div className="grid grid-cols-3 gap-3">
-              {(form.gallery || []).map((url) => (
-                <div key={url} className="relative group aspect-video">
-                  <img src={url} alt="" className="w-full h-full object-cover rounded-lg" />
-                  <button
-                    onClick={() => removeGalleryImage(url)}
-                    className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-              <div
-                className="aspect-video border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center text-foreground-secondary hover:border-primary/60 cursor-pointer transition-colors"
-                onClick={() => document.getElementById("gallery-input")?.click()}
+              <button type="button" onClick={openImagePicker} disabled={uploadingImage}>
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5h16v14H4V5Zm0 11 4-4 3 3 2-2 7 6M15 9h.01" /></svg>
+                {uploadingImage ? "上传中…" : "插入图片"}
+              </button>
+              <span className="admin-writing-divider-v2" aria-hidden="true" />
+              <button
+                type="button"
+                data-active={!preview}
+                aria-pressed={!preview}
+                onClick={() => setPreview(false)}
               >
-                <input
-                  id="gallery-input"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleUpload(file, "gallery");
-                    e.target.value = "";
-                  }}
-                />
-                {uploadingGallery ? (
-                  <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <>
-                    <span className="text-xl">+</span>
-                    <span className="text-xs mt-1">上传</span>
-                  </>
-                )}
-              </div>
+                编辑
+              </button>
+              <button
+                type="button"
+                data-active={preview}
+                aria-pressed={preview}
+                onClick={() => setPreview(true)}
+              >
+                预览
+              </button>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Markdown 编辑器 */}
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <label className="block text-sm font-medium text-foreground">项目详情（Markdown）</label>
-          <button
-            onClick={() => setPreview(!preview)}
-            className="text-sm text-primary hover:text-primary-hover"
-          >
-            {preview ? "编辑" : "预览"}
+          {preview ? (
+            <div className="admin-writing-preview-v2">
+              {form.content.trim() ? <ReactMarkdown>{form.content}</ReactMarkdown> : <p>还没有正文内容。</p>}
+            </div>
+          ) : (
+            <textarea
+              ref={editorRef}
+              id="work-content"
+              value={form.content}
+              onChange={(event) => updateField("content", event.target.value)}
+              placeholder="开始写作品介绍。可以使用标题、列表、代码块，也可以在任意位置插入图片……"
+              spellCheck={false}
+            />
+          )}
+        </div>
+      </section>
+
+      <div className="admin-form-actions-v2 admin-writing-actions-v2">
+        <span>{initialWork ? `上次状态：${initialWork.status === "published" ? "已发布" : "草稿"}` : "新作品将先保存为草稿"}</span>
+        <div>
+          <button type="button" onClick={() => handleSubmit(false)} disabled={saving || uploadingImage}>
+            {saving ? "保存中…" : "保存草稿"}
+          </button>
+          <button type="button" onClick={() => handleSubmit(true)} disabled={saving || uploadingImage}>
+            {saving ? "发布中…" : "立即发布"}
           </button>
         </div>
-        {preview ? (
-          <div className="min-h-[300px] max-h-[500px] overflow-y-auto p-4 bg-card border border-border rounded-lg prose prose-invert max-w-none">
-            <ReactMarkdown>{form.content || "暂无内容"}</ReactMarkdown>
-          </div>
-        ) : (
-          <textarea
-            value={form.content}
-            onChange={(e) => updateField("content", e.target.value)}
-            rows={16}
-            className="w-full px-4 py-3 bg-card border border-border rounded-lg focus:outline-none focus:border-primary text-foreground font-mono text-sm resize-y"
-            placeholder="用 Markdown 编写项目详情..."
-          />
-        )}
-      </div>
-
-      {/* 操作按钮 */}
-      <div className="flex items-center justify-end gap-4 pt-4 border-t border-border">
-        <button
-          onClick={() => handleSubmit(false)}
-          disabled={saving}
-          className="px-6 py-2 bg-card hover:bg-muted border border-border rounded-lg text-foreground transition-colors disabled:opacity-50"
-        >
-          {saving ? "保存中..." : "保存草稿"}
-        </button>
-        <button
-          onClick={() => handleSubmit(true)}
-          disabled={saving}
-          className="px-6 py-2 bg-primary hover:bg-primary/90 rounded-lg text-white transition-colors disabled:opacity-50"
-        >
-          {saving ? "发布中..." : "立即发布"}
-        </button>
       </div>
     </div>
   );

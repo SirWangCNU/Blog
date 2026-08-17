@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { MotionDiv, MotionSection } from "@/components/MotionPrimitives";
 import { ProjectCard } from "@/components/ProjectCard";
 import { listWorks } from "@/lib/works/store";
 
@@ -12,7 +12,7 @@ export default async function ProjectsPage() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-16">
       {/* 页头 */}
-      <motion.div
+      <MotionDiv
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -24,11 +24,11 @@ export default async function ProjectsPage() {
         <p className="text-lg text-foreground-secondary">
           我参与和独立完成的各类项目，涵盖AI大模型、全栈开发、计算机视觉等多个领域
         </p>
-      </motion.div>
+      </MotionDiv>
 
       {/* 精选项目 */}
       {featured.length > 0 && (
-        <motion.section
+        <MotionSection
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
@@ -42,12 +42,12 @@ export default async function ProjectsPage() {
               <ProjectCard key={project.id} project={project} index={index} />
             ))}
           </div>
-        </motion.section>
+        </MotionSection>
       )}
 
       {/* 其他项目 */}
       {others.length > 0 && (
-        <motion.section
+        <MotionSection
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
@@ -60,7 +60,7 @@ export default async function ProjectsPage() {
               <ProjectCard key={project.id} project={project} index={index} />
             ))}
           </div>
-        </motion.section>
+        </MotionSection>
       )}
 
       {works.length === 0 && (

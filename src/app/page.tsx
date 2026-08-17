@@ -1,11 +1,16 @@
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import {
+  MotionArticle,
+  MotionDiv,
+  MotionH1,
+  MotionH2,
+  ScrollPrompt,
+} from "@/components/MotionPrimitives";
 import { ProjectCard } from "@/components/ProjectCard";
 import { TypewriterText } from "@/components/TypewriterText";
 import { Sidebar } from "@/components/Sidebar";
 import { posts } from "@/data/posts";
-import { categories } from "@/data/posts";
 import { listWorks } from "@/lib/works/store";
 
 export const dynamic = "force-dynamic";
@@ -34,7 +39,7 @@ export default async function Home() {
         {/* 内容 */}
         <div className="relative z-[2] text-center max-w-3xl mx-auto">
           {/* 头像 */}
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6 }}
@@ -50,20 +55,20 @@ export default async function Home() {
                 priority
               />
             </div>
-          </motion.div>
+          </MotionDiv>
 
           {/* 博客标题 */}
-          <motion.h1
+          <MotionH1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.15 }}
             className="text-3xl sm:text-4xl font-bold text-white mb-3 font-mono"
           >
             欢迎来到王景皓的技术博客
-          </motion.h1>
+          </MotionH1>
 
           {/* 打字机副标题 */}
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
@@ -80,10 +85,10 @@ export default async function Home() {
               deletingSpeed={30}
               pauseTime={2500}
             />
-          </motion.div>
+          </MotionDiv>
 
           {/* 社交图标 */}
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.45 }}
@@ -112,29 +117,11 @@ export default async function Home() {
             >
               阅读博客
             </Link>
-          </motion.div>
+          </MotionDiv>
         </div>
 
         {/* 向下滚动箭头 */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
-        >
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="text-white/40 text-2xl cursor-pointer"
-            onClick={() =>
-              document
-                .getElementById("content-area")
-                ?.scrollIntoView({ behavior: "smooth" })
-            }
-          >
-            ▼
-          </motion.div>
-        </motion.div>
+        <ScrollPrompt />
       </section>
 
       {/* ===== 主内容区 ===== */}
@@ -144,25 +131,25 @@ export default async function Home() {
       >
         {/* 彩色浮动光斑装饰 */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <motion.div
+          <MotionDiv
             animate={{ x: [0, 30, -20, 0], y: [0, -40, 20, 0] }}
             transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
             className="absolute top-20 left-[10%] w-64 h-64 rounded-full opacity-[0.07]"
             style={{ background: "radial-gradient(circle, #53d8a8, transparent 70%)", filter: "blur(40px)" }}
           />
-          <motion.div
+          <MotionDiv
             animate={{ x: [0, -25, 35, 0], y: [0, 30, -25, 0] }}
             transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
             className="absolute top-40 right-[15%] w-48 h-48 rounded-full opacity-[0.06]"
             style={{ background: "radial-gradient(circle, #64b5f6, transparent 70%)", filter: "blur(40px)" }}
           />
-          <motion.div
+          <MotionDiv
             animate={{ x: [0, 20, -30, 0], y: [0, -20, 40, 0] }}
             transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
             className="absolute bottom-40 left-[30%] w-56 h-56 rounded-full opacity-[0.05]"
             style={{ background: "radial-gradient(circle, #a78bfa, transparent 70%)", filter: "blur(40px)" }}
           />
-          <motion.div
+          <MotionDiv
             animate={{ x: [0, -15, 25, 0], y: [0, 35, -15, 0] }}
             transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
             className="absolute bottom-20 right-[25%] w-40 h-40 rounded-full opacity-[0.06]"
@@ -170,21 +157,21 @@ export default async function Home() {
           />
         </div>
 
-        <motion.h2
+        <MotionH2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="text-xl font-bold text-foreground mb-6 font-mono flex items-center gap-2"
         >
           📝 最新文章
-        </motion.h2>
+        </MotionH2>
 
         <div className="relative z-10 flex flex-col lg:flex-row gap-8">
           {/* 左侧：文章列表 */}
           <div className="flex-1 min-w-0">
             <div className="space-y-5">
               {latestPosts.map((post, index) => (
-                <motion.article
+                <MotionArticle
                   key={post.slug}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -283,12 +270,12 @@ export default async function Home() {
                       </div>
                     </div>
                   </Link>
-                </motion.article>
+                </MotionArticle>
               ))}
             </div>
 
             {/* 查看全部 */}
-            <motion.div
+            <MotionDiv
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
@@ -300,7 +287,7 @@ export default async function Home() {
               >
                 查看全部文章 →
               </Link>
-            </motion.div>
+            </MotionDiv>
           </div>
 
           {/* 右侧：信息栏 */}
@@ -311,7 +298,7 @@ export default async function Home() {
       {/* ===== 精选项目 ===== */}
       <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -323,7 +310,7 @@ export default async function Home() {
             <p className="text-foreground-secondary text-sm">
               这些是我最引以为傲的作品
             </p>
-          </motion.div>
+          </MotionDiv>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredProjects.map((project, index) => (
@@ -331,7 +318,7 @@ export default async function Home() {
             ))}
           </div>
 
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -344,14 +331,14 @@ export default async function Home() {
             >
               查看所有项目 →
             </Link>
-          </motion.div>
+          </MotionDiv>
         </div>
       </section>
 
       {/* ===== 技术栈 ===== */}
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -360,7 +347,7 @@ export default async function Home() {
             <h2 className="text-2xl font-bold text-foreground mb-2 font-mono">
               🛠️ 技术栈
             </h2>
-          </motion.div>
+          </MotionDiv>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {[
@@ -407,7 +394,7 @@ export default async function Home() {
                 icon: "🔧",
               },
             ].map((stack, index) => (
-              <motion.div
+              <MotionDiv
                 key={stack.category}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -431,7 +418,7 @@ export default async function Home() {
                     </span>
                   ))}
                 </div>
-              </motion.div>
+              </MotionDiv>
             ))}
           </div>
         </div>

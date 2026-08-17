@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { WorkForm } from "../components/WorkForm";
@@ -28,25 +29,29 @@ export default function EditWorkPage() {
 
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-16 font-mono flex items-center justify-center">
-        <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
+      <div className="admin-card-v2 admin-card-v2-empty" aria-label="正在读取作品">正在读取作品…</div>
     );
   }
 
   if (!work) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-16 font-mono text-center text-foreground-secondary">
-        作品不存在
+      <div className="admin-card-v2 admin-missing-v2">
+        <h1>作品不存在</h1>
+        <p>它可能已被删除，或链接中的编号不正确。</p>
+        <Link href="/admin/works" className="admin-v2-button">返回作品列表</Link>
       </div>
     );
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-16 font-mono">
-      <h1 className="text-3xl font-bold text-foreground mb-8">
-        <span className="text-primary">#</span> 编辑作品
-      </h1>
+    <div className="admin-editor-v2-page">
+      <header className="admin-page-v2-header">
+        <div>
+          <h1>编辑作品</h1>
+          <p>修改标题或正文，保存后同步到作品列表。</p>
+        </div>
+        <Link href="/admin/works" className="admin-v2-button">返回作品列表</Link>
+      </header>
       <WorkForm initialWork={work} onSaved={handleSaved} />
     </div>
   );

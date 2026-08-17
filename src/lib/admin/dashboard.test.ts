@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Post } from "@/data/posts";
+import type { Post } from "@/lib/content/types";
 import type { Work } from "@/lib/works/types";
 import { buildAdminDashboard } from "./dashboard";
 
@@ -32,6 +32,7 @@ const works: Work[] = [
 
 const posts: Post[] = [
   {
+    id: 1,
     slug: "latest-post",
     title: "最新文章",
     excerpt: "摘要",
@@ -40,8 +41,13 @@ const posts: Post[] = [
     tags: ["设计"],
     category: "前端",
     content: "正文",
+    status: "published",
+    publishedAt: "2026-08-16T00:00:00.000Z",
+    createdAt: "2026-08-16T00:00:00.000Z",
+    updatedAt: "2026-08-16T00:00:00.000Z",
   },
   {
+    id: 2,
     slug: "older-post",
     title: "较早文章",
     excerpt: "摘要",
@@ -50,6 +56,10 @@ const posts: Post[] = [
     tags: [],
     category: "后端",
     content: "正文",
+    status: "published",
+    publishedAt: "2026-08-14T00:00:00.000Z",
+    createdAt: "2026-08-14T00:00:00.000Z",
+    updatedAt: "2026-08-14T00:00:00.000Z",
   },
 ];
 

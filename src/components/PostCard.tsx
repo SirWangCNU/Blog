@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { TagBadge } from "./TagBadge";
-import type { Post } from "@/data/posts";
+import type { Post } from "@/lib/content/types";
 
 interface PostCardProps {
   post: Post;

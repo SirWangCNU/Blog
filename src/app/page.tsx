@@ -10,13 +10,14 @@ import {
 import { ProjectCard } from "@/components/ProjectCard";
 import { TypewriterText } from "@/components/TypewriterText";
 import { Sidebar } from "@/components/Sidebar";
-import { posts } from "@/data/posts";
+import { listPosts } from "@/lib/content/posts";
 import { listWorks } from "@/lib/works/store";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const works = await listWorks();
+  const posts = listPosts();
   const featuredProjects = works.filter((p) => p.featured).slice(0, 3);
   const latestPosts = posts.slice(0, 10);
 
@@ -291,7 +292,7 @@ export default async function Home() {
           </div>
 
           {/* 右侧：信息栏 */}
-          <Sidebar />
+          <Sidebar posts={posts} />
         </div>
       </div>
 

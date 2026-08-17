@@ -3,9 +3,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { posts, categories } from "@/data/posts";
+import type { Post } from "@/lib/content/types";
 
-export function Sidebar() {
+export function Sidebar({ posts }: { posts: Post[] }) {
+  const categories = ["全部", ...new Set(posts.map((post) => post.category).filter(Boolean))];
   // 统计
   const totalPosts = posts.length;
   const totalCategories = categories.filter((c) => c !== "全部").length;

@@ -1,4 +1,4 @@
-import type { Post } from "@/data/posts";
+import type { Post } from "@/lib/content/types";
 import type { Work } from "@/lib/works/types";
 
 export interface AdminDashboardData {

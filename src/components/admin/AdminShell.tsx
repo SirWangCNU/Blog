@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import {
   ADMIN_NAV_ITEMS,
@@ -27,10 +27,22 @@ function AdminIcon({ name }: { name: AdminNavIcon }) {
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const [openMenuPath, setOpenMenuPath] = useState<string | null>(null);
+  const [loggingOut, setLoggingOut] = useState(false);
   const mobileOpen = openMenuPath === pathname;
   const current = ADMIN_NAV_ITEMS.find((item) => isAdminPathActive(pathname, item.href));
+
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    try {
+      await fetch("/api/admin/auth/logout", { method: "POST" });
+    } finally {
+      router.push("/admin/login");
+      router.refresh();
+    }
+  };
 
   return (
     <div className="admin-v2-layout" data-collapsed={collapsed} data-mobile-open={mobileOpen}>
@@ -119,9 +131,15 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 5h5v5M19 5l-9 9M18 13v6H5V6h6" /></svg>
             </Link>
             <span className="admin-v2-separator" />
-            <button type="button" className="admin-v2-profile" aria-label="管理员账户">
+            <button
+              type="button"
+              className="admin-v2-profile"
+              aria-label="退出登录"
+              onClick={handleLogout}
+              disabled={loggingOut}
+            >
               <span>W</span>
-              <strong>王景皓</strong>
+              <strong>{loggingOut ? "正在退出" : "退出登录"}</strong>
             </button>
           </div>
         </header>

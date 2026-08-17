@@ -3,14 +3,18 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AdminShell } from "./AdminShell";
 
 const usePathname = vi.fn();
+const push = vi.fn();
 
 vi.mock("next/navigation", () => ({
   usePathname: () => usePathname(),
+  useRouter: () => ({ push, refresh: vi.fn() }),
 }));
 
 describe("AdminShell", () => {
   beforeEach(() => {
     usePathname.mockReturnValue("/admin");
+    push.mockReset();
+    vi.restoreAllMocks();
   });
 
   it("renders a standard admin shell without archive-style branding", () => {
@@ -41,5 +45,13 @@ describe("AdminShell", () => {
     render(<AdminShell>内容</AdminShell>);
 
     expect(screen.getByRole("button", { name: "打开后台导航" })).toBeInTheDocument();
+  });
+  it("logs the administrator out and returns to the login page", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify({ success: true })));
+    render(<AdminShell>content</AdminShell>);
+
+    fireEvent.click(screen.getByRole("button", { name: "退出登录" }));
+
+    await vi.waitFor(() => expect(push).toHaveBeenCalledWith("/admin/login"));
   });
 });

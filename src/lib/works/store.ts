@@ -1,90 +1,106 @@
-import { readdir, readFile, writeFile, unlink, mkdir, stat } from "fs/promises";
-import { join } from "path";
+import type { DatabaseSync } from "node:sqlite";
+import { getDatabase } from "@/lib/db/database";
 import type { Work, WorkInput } from "./types";
 
-const WORKS_DIR = join(process.cwd(), "data", "works");
+interface WorkRow {
+  id: string;
+  title: string;
+  summary: string;
+  cover: string;
+  tags_json: string;
+  category: string;
+  github: string;
+  demo: string;
+  doc: string;
+  content: string;
+  gallery_json: string;
+  featured: number;
+  status: Work["status"];
+  created_at: string;
+  updated_at: string;
+}
 
-async function ensureDir() {
+function parseStringArray(value: string): string[] {
   try {
-    await mkdir(WORKS_DIR, { recursive: true });
-  } catch {}
-}
-
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^\w\u4e00-\u9fa5]+/g, "-")
-    .replace(/^-|-$/g, "")
-    .slice(0, 80);
-}
-
-function generateId(title: string, existingIds: string[]): string {
-  const base = slugify(title) || `${Date.now()}`;
-  let id = base;
-  let counter = 1;
-  while (existingIds.includes(id)) {
-    id = `${base}-${counter}`;
-    counter++;
-  }
-  return id;
-}
-
-export async function listWorks(includeDrafts = false): Promise<Work[]> {
-  await ensureDir();
-  try {
-    const entries = await readdir(WORKS_DIR);
-    const works = await Promise.all(
-      entries
-        .filter((name) => name.endsWith(".json"))
-        .map(async (name) => {
-          const content = await readFile(join(WORKS_DIR, name), "utf-8");
-          return JSON.parse(content) as Work;
-        })
-    );
-    return works
-      .filter((w) => includeDrafts || w.status === "published")
-      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    const parsed: unknown = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === "string") : [];
   } catch {
     return [];
   }
 }
 
-export async function getWork(id: string): Promise<Work | null> {
-  await ensureDir();
-  try {
-    const content = await readFile(join(WORKS_DIR, `${id}.json`), "utf-8");
-    return JSON.parse(content) as Work;
-  } catch {
-    return null;
-  }
-}
-
-export async function saveWork(input: WorkInput): Promise<Work> {
-  await ensureDir();
-  const existingIds = (await listWorks(true)).map((w) => w.id);
-  const id = input.id || generateId(input.title, existingIds);
-  const now = new Date().toISOString();
-
-  const existing = input.id ? await getWork(input.id) : null;
-
-  const work: Work = {
-    ...input,
-    id,
-    tags: input.tags || [],
-    gallery: input.gallery || [],
-    featured: input.featured ?? false,
-    status: input.status || "draft",
-    createdAt: existing?.createdAt || now,
-    updatedAt: now,
+function mapWork(row: WorkRow): Work {
+  return {
+    id: row.id,
+    title: row.title,
+    summary: row.summary,
+    cover: row.cover,
+    tags: parseStringArray(row.tags_json),
+    category: row.category,
+    github: row.github,
+    demo: row.demo,
+    doc: row.doc,
+    content: row.content,
+    gallery: parseStringArray(row.gallery_json),
+    featured: row.featured === 1,
+    status: row.status,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
   };
-
-  await writeFile(join(WORKS_DIR, `${id}.json`), JSON.stringify(work, null, 2), "utf-8");
-  return work;
 }
 
-export async function deleteWork(id: string): Promise<void> {
-  await ensureDir();
-  try {
-    await unlink(join(WORKS_DIR, `${id}.json`));
-  } catch {}
+function slugify(text: string): string {
+  return text.toLowerCase().replace(/[^\w\u4e00-\u9fa5]+/g, "-").replace(/^-|-$/g, "").slice(0, 80);
+}
+
+function generateId(title: string, db: DatabaseSync): string {
+  const base = slugify(title) || `${Date.now()}`;
+  let id = base;
+  let counter = 1;
+  while (db.prepare("SELECT 1 FROM works WHERE id = ?").get(id)) {
+    id = `${base}-${counter}`;
+    counter += 1;
+  }
+  return id;
+}
+
+export async function listWorks(includeDrafts = false, db: DatabaseSync = getDatabase()): Promise<Work[]> {
+  const rows = includeDrafts
+    ? db.prepare("SELECT * FROM works ORDER BY updated_at DESC").all()
+    : db.prepare("SELECT * FROM works WHERE status = 'published' ORDER BY updated_at DESC").all();
+  return rows.map((row) => mapWork(row as unknown as WorkRow));
+}
+
+export async function getWork(id: string, db: DatabaseSync = getDatabase()): Promise<Work | null> {
+  const row = db.prepare("SELECT * FROM works WHERE id = ?").get(id);
+  return row ? mapWork(row as unknown as WorkRow) : null;
+}
+
+export async function saveWork(input: WorkInput, db: DatabaseSync = getDatabase()): Promise<Work> {
+  const id = input.id || generateId(input.title, db);
+  const existing = input.id ? await getWork(input.id, db) : null;
+  const now = new Date().toISOString();
+  const createdAt = existing?.createdAt ?? now;
+
+  db.prepare(`
+    INSERT INTO works (
+      id, title, summary, cover, tags_json, category, github, demo, doc,
+      content, gallery_json, featured, status, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(id) DO UPDATE SET
+      title = excluded.title, summary = excluded.summary, cover = excluded.cover,
+      tags_json = excluded.tags_json, category = excluded.category, github = excluded.github,
+      demo = excluded.demo, doc = excluded.doc, content = excluded.content,
+      gallery_json = excluded.gallery_json, featured = excluded.featured,
+      status = excluded.status, updated_at = excluded.updated_at
+  `).run(
+    id, input.title.trim(), input.summary.trim(), input.cover || "", JSON.stringify(input.tags || []),
+    input.category || "", input.github || "", input.demo || "", input.doc || "", input.content || "",
+    JSON.stringify(input.gallery || []), input.featured ? 1 : 0, input.status || "draft", createdAt, now,
+  );
+  return (await getWork(id, db))!;
+}
+
+export async function deleteWork(id: string, db: DatabaseSync = getDatabase()): Promise<void> {
+  db.prepare("DELETE FROM works WHERE id = ?").run(id);
 }

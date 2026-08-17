@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { listWorks, getWork, saveWork, deleteWork } from "@/lib/works/store";
 import type { WorkInput } from "@/lib/works/types";
+import { requireApiAdmin } from "@/lib/auth/guard";
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,10 +9,19 @@ export async function GET(request: NextRequest) {
     const id = searchParams.get("id");
     const includeDrafts = searchParams.get("includeDrafts") === "true";
 
+    if (includeDrafts) {
+      const auth = await requireApiAdmin(request);
+      if (auth instanceof NextResponse) return auth;
+    }
+
     if (id) {
       const work = await getWork(id);
       if (!work) {
         return NextResponse.json({ error: "作品不存在" }, { status: 404 });
+      }
+      if (work.status === "draft") {
+        const auth = await requireApiAdmin(request);
+        if (auth instanceof NextResponse) return auth;
       }
       return NextResponse.json({ work });
     }
@@ -26,6 +36,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireApiAdmin(request);
+    if (auth instanceof NextResponse) return auth;
     const body = (await request.json()) as WorkInput;
 
     if (!body.title?.trim() || !body.summary?.trim()) {
@@ -42,6 +54,8 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
+    const auth = await requireApiAdmin(request);
+    if (auth instanceof NextResponse) return auth;
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 

@@ -1,15 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
+import { resolve, sep } from "path";
+import { requireApiAdmin } from "@/lib/auth/guard";
+import { saveMedia } from "@/lib/content/media";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"];
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 
 export async function POST(request: NextRequest) {
+  const auth = await requireApiAdmin(request);
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File;
-    const folder = (formData.get("folder") as string) || "";
+    const rawFolder = (formData.get("folder") as string) || "";
+    const folder = rawFolder.replace(/\\/g, "/").replace(/^\/+|\/+$/g, "");
+
+    if (folder.split("/").includes("..") || !/^[\w\-/]*$/.test(folder)) {
+      return NextResponse.json({ error: "上传目录无效" }, { status: 400 });
+    }
 
     if (!file) {
       return NextResponse.json({ error: "未选择文件" }, { status: 400 });
@@ -33,23 +43,38 @@ export async function POST(request: NextRequest) {
     const originalName = file.name;
     const safeName = `${timestamp}-${originalName.replace(/[^a-zA-Z0-9.\-_\u4e00-\u9fa5]/g, "_")}`;
 
-    const uploadDir = join(process.cwd(), "public", "uploads", folder);
+    const uploadRoot = resolve(process.cwd(), "public", "uploads");
+    const uploadDir = resolve(uploadRoot, folder);
+    if (uploadDir !== uploadRoot && !uploadDir.startsWith(`${uploadRoot}${sep}`)) {
+      return NextResponse.json({ error: "上传目录无效" }, { status: 400 });
+    }
     await mkdir(uploadDir, { recursive: true });
 
-    const filePath = join(uploadDir, safeName);
+    const filePath = resolve(uploadDir, safeName);
     await writeFile(filePath, buffer);
 
     const url = folder ? `/uploads/${folder}/${safeName}` : `/uploads/${safeName}`;
+    const relativePath = folder ? `${folder}/${safeName}` : safeName;
+    const uploadedAt = new Date().toISOString();
+    saveMedia({
+      originalName,
+      savedName: safeName,
+      relativePath,
+      url,
+      mimeType: file.type,
+      size: file.size,
+      uploadedAt,
+    });
 
     return NextResponse.json({
       success: true,
       file: {
         name: originalName,
-        savedName: safeName,
+        savedName: relativePath,
         size: file.size,
         type: file.type,
         url,
-        uploadedAt: new Date().toISOString(),
+        uploadedAt,
       },
     });
   } catch (error) {

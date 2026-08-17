@@ -6,9 +6,13 @@ import { BlogIndex } from "./BlogIndex";
 vi.mock("framer-motion", async () => {
   const React = await import("react");
   const motion = new Proxy({}, {
-    get: (_target, tag: string) => React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(
-      ({ children, ...props }, ref) => React.createElement(tag, { ...props, ref }, children),
-    ),
+    get: (_target, tag: string) => {
+      const MockMotion = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(
+        ({ children, ...props }, ref) => React.createElement(tag, { ...props, ref }, children),
+      );
+      MockMotion.displayName = `MockMotion(${tag})`;
+      return MockMotion;
+    },
   });
   return { motion, AnimatePresence: ({ children }: { children: React.ReactNode }) => children };
 });

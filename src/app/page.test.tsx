@@ -5,8 +5,12 @@ vi.mock("@/lib/content/posts", () => ({ listPosts: vi.fn(() => []) }));
 vi.mock("@/lib/works/store", () => ({ listWorks: vi.fn(async () => []) }));
 vi.mock("@/components/MotionPrimitives", async () => {
   const React = await import("react");
-  const component = (tag: string) => ({ children, ...props }: React.HTMLAttributes<HTMLElement>) =>
-    React.createElement(tag, props, children);
+  const component = (tag: string) => {
+    const MockMotion = ({ children, ...props }: React.HTMLAttributes<HTMLElement>) =>
+      React.createElement(tag, props, children);
+    MockMotion.displayName = `MockMotion(${tag})`;
+    return MockMotion;
+  };
   return {
     MotionArticle: component("article"),
     MotionDiv: component("div"),

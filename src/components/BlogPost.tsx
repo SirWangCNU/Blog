@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import type { Post } from "@/lib/content/types";
 import { TagBadge } from "@/components/TagBadge";
 import { PostCard } from "@/components/PostCard";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
 /* ===== 目录提取 ===== */
 interface TocItem {

@@ -1,6 +1,6 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- project media URLs are administrator-managed runtime assets */
 
-import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { TagBadge } from "./TagBadge";

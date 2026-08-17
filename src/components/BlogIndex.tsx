@@ -31,7 +31,7 @@ export function BlogIndex({ posts }: { posts: Post[] }) {
         );
       return matchesCategory && matchesSearch;
     });
-  }, [selectedCategory, searchQuery]);
+  }, [posts, selectedCategory, searchQuery]);
 
   // 分页计算
   const totalPages = Math.max(1, Math.ceil(filteredPosts.length / POSTS_PER_PAGE));

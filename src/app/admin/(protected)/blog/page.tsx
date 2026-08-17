@@ -11,20 +11,19 @@ export default function AdminBlogPage() {
   const [status, setStatus] = useState<"all" | Post["status"]>("all");
   const [message, setMessage] = useState("");
 
-  const load = async () => {
-    try {
-      const response = await fetch("/api/admin/posts");
-      const data = await response.json() as { posts?: Post[]; error?: string };
-      if (!response.ok) throw new Error(data.error || "读取文章失败");
-      setPosts(data.posts || []);
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "读取文章失败");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => { void load(); }, []);
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/admin/posts")
+      .then(async (response) => {
+        const data = await response.json() as { posts?: Post[]; error?: string };
+        if (!response.ok) throw new Error(data.error || "读取文章失败");
+        return data.posts || [];
+      })
+      .then((items) => { if (!cancelled) setPosts(items); })
+      .catch((error) => { if (!cancelled) setMessage(error instanceof Error ? error.message : "读取文章失败"); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, []);
 
   const filtered = useMemo(() => posts.filter((post) => {
     const matchesStatus = status === "all" || post.status === status;

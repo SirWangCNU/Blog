@@ -80,6 +80,7 @@ export default function FilesPage() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetchFiles updates state after its awaited request completes.
     fetchFiles();
   }, [fetchFiles]);
 

@@ -6,7 +6,7 @@
 
 **Architecture:** A server-only SQLite adapter owns connection setup and migrations, while focused repositories map database rows to existing view models. Authentication uses `scrypt` password hashes, opaque hashed sessions, server-side route guards, and protected mutation APIs. Public pages continue to use their existing components but receive published records from the repositories.
 
-**Tech Stack:** Next.js 16 App Router, React 19, TypeScript, `better-sqlite3`, Node `crypto`, Vitest, Testing Library, SQLite WAL.
+**Tech Stack:** Next.js 16 App Router, React 19, TypeScript, Node 22+ built-in `node:sqlite`, Node `crypto`, Vitest, Testing Library, SQLite WAL.
 
 ## Global Constraints
 
@@ -60,13 +60,13 @@
 - Modify: `.gitignore`
 
 **Interfaces:**
-- Produces: `createDatabase(path: string): Database.Database`
-- Produces: `getDatabase(): Database.Database`
+- Produces: `createDatabase(path: string): DatabaseSync`
+- Produces: `getDatabase(): DatabaseSync`
 - Produces: `closeDatabaseForTests(): void`
 
 - [ ] **Step 1: Add dependencies**
 
-Run: `pnpm add better-sqlite3 && pnpm add -D @types/better-sqlite3 tsx`
+Run: `pnpm add -D @types/node@^22 tsx`
 
 Add scripts to `package.json`:
 

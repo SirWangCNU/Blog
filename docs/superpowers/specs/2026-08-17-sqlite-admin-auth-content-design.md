@@ -23,7 +23,7 @@
 
 ## 技术选型
 
-使用 `better-sqlite3` 直接访问 SQLite，不引入 ORM。数据库默认位于 `data/blog.sqlite`，可通过环境变量覆盖持久化数据目录。SQLite 与当前单机 PM2 部署方式匹配，部署时必须保留数据库文件。
+使用 Node.js 22 及以上版本内置的 `node:sqlite` 直接访问 SQLite，不引入 ORM 或额外原生数据库依赖。数据库默认位于 `data/blog.sqlite`，可通过环境变量覆盖持久化数据目录。SQLite 与当前单机 PM2 部署方式匹配，部署时必须保留数据库文件。
 
 密码哈希和令牌生成使用 Node.js 内置 `crypto`：密码采用随机盐与 `scrypt`，会话令牌采用密码学安全随机字节。浏览器仅持有原始令牌，数据库仅保存令牌的 SHA-256 哈希。
 

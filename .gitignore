@@ -1,15 +1,5 @@
-<<<<<<< HEAD
-node_modules/
-.next/
-
-=======
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
-/node_modules
-
-# uploads
-public/uploads/
+/node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -19,18 +9,32 @@ public/uploads/
 !.yarn/versions
 
 # testing
-/coverage
+/coverage/
 
 # next.js
 /.next/
 /out/
+/build/
 
-# production
-/build
+# persistent runtime data
+/data/*.sqlite
+/data/*.sqlite-*
+/backups/
+/public/uploads/
+
+# local worktrees
+/.worktrees/
+/worktrees/
+
+# environment and secrets
+.env*
+!.env.example
 
 # misc
 .DS_Store
 *.pem
+*.tsbuildinfo
+next-env.d.ts
 
 # debug
 npm-debug.log*
@@ -38,13 +42,5 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
->>>>>>> ceccea7d4b1b0185759feaad8a061764536e7fdd
+# deployment providers
+.vercel/

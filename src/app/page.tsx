@@ -118,6 +118,12 @@ export default async function Home() {
             >
               阅读博客
             </Link>
+            <Link
+              href="/admin"
+              className="px-3 py-1.5 bg-black/15 backdrop-blur text-white/70 rounded-full text-xs font-mono hover:bg-white/10 hover:text-white transition-all border border-white/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >
+              后台管理
+            </Link>
           </MotionDiv>
         </div>
 

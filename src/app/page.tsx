@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { ArrowRight } from "lucide-react";
 import {
   MotionArticle,
   MotionDiv,
@@ -8,6 +9,7 @@ import {
   ScrollPrompt,
 } from "@/components/MotionPrimitives";
 import { ProjectCard } from "@/components/ProjectCard";
+import { ProjectSectionHeading } from "@/components/ProjectSectionHeading";
 import { TypewriterText } from "@/components/TypewriterText";
 import { Sidebar } from "@/components/Sidebar";
 import { listPosts } from "@/lib/content/posts";
@@ -114,7 +116,7 @@ export default async function Home() {
             </Link>
             <Link
               href="/blog"
-              className="px-5 py-2 bg-primary/80 backdrop-blur text-white rounded-full text-sm font-mono hover:bg-primary transition-all border border-primary/40"
+              className="px-5 py-2 bg-white/10 backdrop-blur text-white rounded-full text-sm font-mono hover:bg-primary/30 hover:text-primary transition-all border border-white/20"
             >
               阅读博客
             </Link>
@@ -309,17 +311,18 @@ export default async function Home() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-10"
+            className="mb-10"
           >
-            <h2 className="text-2xl font-bold text-foreground mb-2 font-mono">
-              ✨ 精选项目
-            </h2>
-            <p className="text-foreground-secondary text-sm">
-              这些是我最引以为傲的作品
-            </p>
+            <ProjectSectionHeading
+              index="01"
+              eyebrow="SELECTED WORK"
+              title="精选项目"
+              count={featuredProjects.length}
+              description="这些是我最引以为傲的作品"
+            />
           </MotionDiv>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
             {featuredProjects.map((project, index) => (
               <ProjectCard key={project.id} project={project} index={index} />
             ))}
@@ -334,9 +337,10 @@ export default async function Home() {
           >
             <Link
               href="/projects"
-              className="inline-flex items-center gap-2 text-primary hover:text-primary-hover font-mono text-sm transition-colors"
+              className="group inline-flex min-h-10 items-center gap-3 border-b border-primary/25 px-1 font-mono text-sm text-primary [text-shadow:none] transition-colors hover:border-primary hover:text-primary-hover"
             >
-              查看所有项目 →
+              查看所有项目
+              <ArrowRight aria-hidden="true" className="size-4 transition-transform duration-200 group-hover:translate-x-1" strokeWidth={1.7} />
             </Link>
           </MotionDiv>
         </div>
